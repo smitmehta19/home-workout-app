@@ -63,7 +63,7 @@ To install it on your phone, open the deployed URL in your browser and choose "A
 
 ### Deploying
 
-Push to `main` and the included GitHub Actions workflow publishes the site to GitHub Pages. Enable it once under **Settings → Pages → Source → GitHub Actions**.
+Push to `main` and the included GitHub Actions workflow publishes the site to GitHub Pages. The workflow enables Pages itself on first run, so there is nothing to configure by hand.
 
 ---
 

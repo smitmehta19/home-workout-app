@@ -1,0 +1,16 @@
+{
+  "name": "Home Gym — Guided Workouts",
+  "short_name": "Home Gym",
+  "description": "A guided home workout app for a dumbbell, rod and band setup. Smart weekly plan, progressive overload and an interactive muscle map.",
+  "start_url": "./index.html#/",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0b0d10",
+  "theme_color": "#0b0d10",
+  "categories": ["health", "fitness", "sports"],
+  "icons": [
+    { "src": "./icons/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
+    { "src": "./icons/icon-maskable.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "maskable" }
+  ]
+}

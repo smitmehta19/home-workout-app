@@ -27,8 +27,12 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/configure-pages@v5
         with:
-          # Turn Pages on from the workflow itself, so a fresh clone of this
-          # repo deploys without anyone having to visit the settings page.
+          # Best effort: creates the Pages site automatically where the workflow
+          # token is allowed to. It often is not — GITHUB_TOKEN cannot create a
+          # Pages site without repository admin rights, and fails with
+          # "Resource not accessible by integration". In that case enable Pages
+          # once by hand (Settings → Pages → Source → GitHub Actions); this step
+          # then finds the existing site and the deploy proceeds normally.
           enablement: true
       - uses: actions/upload-pages-artifact@v3
         with:

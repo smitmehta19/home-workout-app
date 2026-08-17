@@ -63,7 +63,9 @@ To install it on your phone, open the deployed URL in your browser and choose "A
 
 ### Deploying
 
-Push to `main` and the included GitHub Actions workflow publishes the site to GitHub Pages. The workflow enables Pages itself on first run, so there is nothing to configure by hand.
+Push to `main` and the included GitHub Actions workflow publishes the site to GitHub Pages.
+
+Pages has to be switched on once by hand before the first deploy can succeed: **Settings → Pages → Source → GitHub Actions**. The workflow asks to enable it automatically, but `GITHUB_TOKEN` is not permitted to create a Pages site without repository admin rights, so it fails with *"Resource not accessible by integration"* until you flip that switch. Afterwards every push to `main` deploys on its own.
 
 ---
 

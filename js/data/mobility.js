@@ -36,9 +36,9 @@ const UPPER_WARMUP = [
     reps: 10, pattern: 'pushup',
     cue: 'Arms stay straight. Only the shoulder blades move — pinch together, then push apart.',
   }),
-  W('pass-through', 'Shoulder pass-throughs with the empty rod', MOBILISE, {
+  W('pass-through', 'Shoulder pass-throughs', MOBILISE, {
     reps: 10, pattern: 'pull-apart',
-    cue: 'Wide grip, arms straight, take the bar from your thighs to behind you. Widen the grip if it pinches.',
+    cue: 'A band is better than the rod here — hold it wide, arms straight, and take it from your thighs to behind you. Widen your hands if it pinches.',
   }),
   W('cat-cow', 'Cat–cow', MOBILISE, {
     reps: 8, pattern: 'bird-dog',
@@ -64,9 +64,9 @@ const LOWER_WARMUP = [
     reps: 15, pattern: 'glute-bridge',
     cue: 'Squeeze hard at the top. Gets the glutes firing so your lower back does not take over later.',
   }),
-  W('bird-dog-warm', 'Bird dog', ACTIVATE, {
-    reps: 8, perSide: true, pattern: 'bird-dog',
-    cue: 'Slow. Keep the hips square and the lower back still.',
+  W('band-walk-warm', 'Banded lateral walks', ACTIVATE, {
+    reps: 12, perSide: true, pattern: 'wide-squat',
+    cue: 'Band above the knees, quarter squat, step sideways against it. Switches on the side of the hip so the knees track properly once you load up.',
   }),
   W('bw-squat', 'Bodyweight squats to full depth', MOBILISE, {
     reps: 10, pattern: 'squat',
@@ -131,7 +131,7 @@ const UPPER_STRETCH = [
 
 const LOWER_STRETCH = [
   S('quad-stand', 'Standing quad stretch', 30, 'Heel to glute, knees together, push the hip forward. Hold a wall for balance.', { perSide: true, pattern: 'carry' }),
-  S('hamstring-seated', 'Seated hamstring stretch', 30, 'One leg straight, hinge from the hip with a flat back. Chest toward the knee, not the nose.', { perSide: true, pattern: 'rdl' }),
+  S('band-hamstring', 'Lying hamstring stretch with a band', 30, 'On your back, band looped round the foot, leg raised and straight. Pull gently on the band and let the leg come toward you.', { perSide: true, pattern: 'leg-raise' }),
   S('figure-4', 'Figure-4 glute stretch', 30, 'On your back, ankle across the opposite knee, pull the far thigh toward you.', { perSide: true, pattern: 'glute-bridge' }),
   S('hip-flexor', 'Kneeling hip flexor stretch', 30, 'Half-kneeling, tuck the pelvis under, then press the hip forward. Undoes a day of sitting.', { perSide: true, pattern: 'split-squat' }),
   S('calf-wall', 'Calf stretch against a wall', 30, 'Back leg straight, heel down, lean into the wall. Then repeat with that knee slightly bent.', { perSide: true, pattern: 'calf-raise' }),
@@ -143,7 +143,7 @@ const FULL_STRETCH = [
   S('chest-wall', 'Doorway chest stretch', 30, 'Forearm on the door frame, turn away until the chest opens.', { perSide: true, pattern: 'pull-apart' }),
   S('tri-overhead', 'Overhead triceps stretch', 30, 'Hand down your spine, press the elbow gently back.', { perSide: true, pattern: 'triceps-overhead' }),
   S('quad-stand', 'Standing quad stretch', 30, 'Heel to glute, knees together, hip pushed forward.', { perSide: true, pattern: 'carry' }),
-  S('hamstring-seated', 'Seated hamstring stretch', 30, 'Hinge from the hip with a flat back.', { perSide: true, pattern: 'rdl' }),
+  S('band-hamstring', 'Lying hamstring stretch with a band', 30, 'Band round the foot, leg straight up, pull gently and let it travel toward you.', { perSide: true, pattern: 'leg-raise' }),
   S('figure-4', 'Figure-4 glute stretch', 30, 'Ankle across the opposite knee, pull the far thigh in.', { perSide: true, pattern: 'glute-bridge' }),
   S('hip-flexor', 'Kneeling hip flexor stretch', 30, 'Tuck the pelvis, then press the hip forward.', { perSide: true, pattern: 'split-squat' }),
   S('spinal-twist', 'Seated spinal twist', 30, 'Rotate toward the top knee, sitting tall.', { perSide: true, pattern: 'twist' }),
@@ -172,6 +172,10 @@ const DETAIL = {
     avoid: ['Forcing height early or arching the lower back to swing higher.'] },
   'glute-bridge-warm': { steps: ['Lie on your back, knees bent, feet flat.', 'Drive through the heels to lift the hips.', 'Squeeze the glutes hard at the top, then lower.'],
     avoid: ['Arching the lower back instead of finishing with the glutes.'] },
+  'band-walk-warm': { steps: ['Loop a band just above the knees and drop into a quarter squat.', 'Step sideways against the band, keeping tension the whole time.', 'Several steps one way, then back the other.'],
+    avoid: ['Standing up between steps, which kills the tension.', 'Letting the knees fall inward.'] },
+  'band-hamstring': { steps: ['Lie on your back, loop a band around the ball of one foot.', 'Raise that leg with the knee straight and the other leg flat on the floor.', 'Pull gently on the band until you feel a stretch behind the thigh, and breathe.'],
+    avoid: ['Bending the raised knee to get the leg higher.', 'Yanking on the band — let it be gentle and steady.'] },
   'bird-dog-warm': { steps: ['On all fours, extend one arm forward and the opposite leg back.', 'Hold two seconds in a straight line.', 'Return and switch sides.'],
     avoid: ['Letting the hips tilt as the leg lifts.'] },
   'bw-squat': { steps: ['Feet shoulder width, toes slightly out.', 'Squat as deep as you comfortably can.', 'Pause a beat at the bottom of the last few reps.'],

@@ -1,9 +1,19 @@
 // Exercise library for a bench-free home gym.
 //
 // Every movement here is performable with: two loadable dumbbells, one loadable
-// rod (barbell), light resistance bands, a mat and the floor. Nothing requires a
-// bench, rack, pull-up bar or machine. That constraint is deliberate — if it
-// isn't in this file, the app will never prescribe it.
+// rod (barbell), light resistance bands, a mat, a sturdy chair and the floor.
+// Nothing requires a bench, rack, pull-up bar or machine. That constraint is
+// deliberate — if it isn't in this file, the app will never prescribe it.
+//
+// The chair is used only where going without support makes a movement worse
+// rather than merely harder: a chest-supported reverse flye instead of wobbling
+// through a bent-over one, a hip thrust instead of a floor bridge, a Bulgarian
+// split squat, a chest-supported row. Everything else stays floor-based.
+//
+// Bands are treated as an accessory, not a substitute for load. They appear
+// where no weighted option exists (vertical pulls, knee-flexion hamstring work),
+// in warm-up activation, and in stretching — not as the main driver of a
+// strength slot when a dumbbell or the rod can do the job.
 //
 // Fields
 //   equipment  which gear the movement needs; used to filter if kit changes
@@ -2370,6 +2380,242 @@ export const EXERCISES = [
       'Rotating the hip open as the leg rises.',
     ],
     videoQuery: 'banded glute kickback form',
+  },
+
+  // ─────────────── ADDED: CHAIR-SUPPORTED (a sturdy chair, not a bench) ─────
+  // A chair is not a bench, but it is enough for the handful of movements that
+  // are genuinely worse without support. Use one that does not roll or tip, and
+  // put it against a wall for anything you step onto or press away from.
+  {
+    id: 'chair-reverse-flye',
+    name: 'Chest-Supported Reverse Flye',
+    equipment: ['dumbbells', 'chair'],
+    pattern: 'reverse-flye', load: 'dumbbell-pair', type: 'isolation',
+    primary: ['rear-delts'], secondary: ['upper-back', 'traps'],
+    reps: [15, 20], rest: 60,
+    setup: 'Sit on the front edge of a chair, feet flat and wide, and fold your chest down onto your thighs. Hold a dumbbell in each hand hanging under your knees.',
+    steps: [
+      'With the chest resting on the thighs, sweep both arms out to the sides.',
+      'Stop level with your shoulders and squeeze the shoulder blades together.',
+      'Lower slowly back under your knees.',
+    ],
+    cues: [
+      'Resting the chest removes the lower back entirely, so you can chase the squeeze instead of fighting to stay hinged.',
+      'This is the version to use when a free-standing bent-over flye turns into a wobble.',
+      'Still go light. Rear delts want control, not load.',
+    ],
+    mistakes: [
+      'Lifting the chest off the thighs to help the weight up.',
+      'Bending and straightening the elbows instead of keeping a fixed soft bend.',
+    ],
+    videoQuery: 'seated bent over rear delt raise form',
+  },
+  {
+    id: 'chair-row',
+    name: 'Chest-Supported Dumbbell Row',
+    equipment: ['dumbbells', 'chair'],
+    pattern: 'single-row', load: 'dumbbell-pair', type: 'compound',
+    primary: ['lats', 'upper-back'], secondary: ['biceps', 'rear-delts'],
+    reps: [10, 12], rest: 105,
+    setup: 'Sit astride a chair facing its back, chest against the backrest, or lean your chest onto the seat of a chair placed in front of you. Dumbbells hanging either side.',
+    steps: [
+      'Let both dumbbells hang at arms length with the shoulder blades spread.',
+      'Row them toward your hips, driving the elbows back.',
+      'Squeeze at the top, then lower to a full stretch.',
+    ],
+    cues: [
+      'With the chest supported, the lower back does nothing — so you can row heavy on a day that already has deadlifts in it.',
+      'Because you cannot cheat with body English, the weight will feel heavier than a free bent row. That is the point.',
+    ],
+    mistakes: [
+      'Pushing the chest off the support to generate momentum.',
+      'Shrugging rather than rowing.',
+    ],
+    videoQuery: 'chest supported dumbbell row form',
+  },
+  {
+    id: 'bulgarian-split-squat',
+    name: 'Bulgarian Split Squat',
+    equipment: ['dumbbells', 'chair'],
+    pattern: 'split-squat', load: 'dumbbell-pair', type: 'compound', unilateral: true,
+    primary: ['quads', 'glutes'], secondary: ['hamstrings', 'adductors', 'abs'],
+    reps: [8, 12], rest: 120,
+    setup: 'Stand a stride in front of a chair and rest the top of your back foot on the seat. Dumbbells at your sides.',
+    steps: [
+      'Lower straight down until the front thigh is about parallel.',
+      'Keep your weight on the front foot; the back leg only balances.',
+      'Drive up through the front heel. Finish all reps before switching.',
+    ],
+    cues: [
+      'The single hardest leg exercise you can do at home, and the chair is all it needs.',
+      'A longer stride hits the glutes; a shorter one loads the quads harder.',
+      'Start with bodyweight. The balance demand is the limiting factor long before load is.',
+    ],
+    mistakes: [
+      'Standing too close to the chair, which jams the front knee.',
+      'Pushing through the back foot to help.',
+    ],
+    videoQuery: 'bulgarian split squat dumbbell form',
+  },
+  {
+    id: 'hip-thrust',
+    name: 'Hip Thrust',
+    equipment: ['rod', 'chair'],
+    pattern: 'glute-bridge', load: 'barbell', type: 'compound',
+    primary: ['glutes'], secondary: ['hamstrings', 'abs'],
+    reps: [8, 12], rest: 150,
+    setup: 'Sit on the floor with your upper back against the edge of a chair seat, knees bent and feet flat. Roll the padded rod over your hips.',
+    steps: [
+      'Drive through your heels and lift the hips until your torso is parallel to the floor.',
+      'Squeeze the glutes hard and hold for a full second at the top.',
+      'Lower under control without resting the weight down.',
+    ],
+    cues: [
+      'The chair support gives a far bigger range than a floor glute bridge, which is why this is the best glute builder available to you.',
+      'Tuck your chin and keep the ribs down — finish with the glutes, not by arching the lower back.',
+      'Pad the bar generously and put the chair against a wall so it cannot slide.',
+    ],
+    mistakes: [
+      'Hyperextending the lower back at the top instead of squeezing the glutes.',
+      'Letting the chair slide out from under your shoulders.',
+    ],
+    videoQuery: 'barbell hip thrust form bench',
+  },
+  {
+    id: 'decline-push-up',
+    name: 'Decline Push-Up',
+    equipment: ['bodyweight', 'chair'],
+    pattern: 'pushup', load: 'bodyweight', type: 'compound',
+    primary: ['chest'], secondary: ['front-delts', 'triceps', 'abs'],
+    reps: [8, 15], rest: 90,
+    setup: 'Hands on the floor, feet up on a chair seat, body in one straight line.',
+    steps: [
+      'Lower your chest toward the floor with the elbows at about 45°.',
+      'Press back up without letting the hips sag.',
+    ],
+    cues: [
+      'Raising the feet shifts load onto the upper chest and shoulders, and makes the push-up meaningfully harder without any weight.',
+      'The higher the feet, the harder it gets — a good way to keep progressing when you run out of dumbbells.',
+    ],
+    mistakes: [
+      'Hips sagging as it gets hard.',
+      'Using a chair that slides; put it against a wall.',
+    ],
+    videoQuery: 'decline push up feet elevated form',
+  },
+  {
+    id: 'incline-push-up',
+    name: 'Incline Push-Up',
+    equipment: ['bodyweight', 'chair'],
+    pattern: 'pushup', load: 'bodyweight', type: 'compound',
+    primary: ['chest'], secondary: ['triceps', 'front-delts'],
+    reps: [12, 20], rest: 60,
+    setup: 'Hands on the seat of a chair, feet back, body in a straight line.',
+    steps: [
+      'Lower your chest to the chair edge.',
+      'Press back up to straight arms.',
+    ],
+    cues: [
+      'The easier push-up. Use it to keep the reps quality when a set of floor push-ups falls apart.',
+      'Higher hands means easier, so a worktop is easier still than a chair.',
+    ],
+    mistakes: [
+      'Letting the hips pike up.',
+      'Bouncing off the chair rather than controlling the descent.',
+    ],
+    videoQuery: 'incline push up form',
+  },
+  {
+    id: 'chair-dip',
+    name: 'Chair Dip',
+    equipment: ['bodyweight', 'chair'],
+    pattern: 'pushdown', load: 'bodyweight', type: 'compound',
+    primary: ['triceps'], secondary: ['chest', 'front-delts'],
+    reps: [8, 15], rest: 75,
+    setup: 'Sit on the front edge of a chair, hands gripping the edge beside your hips, then slide your hips forward off the seat.',
+    steps: [
+      'Bend the elbows and lower your hips toward the floor.',
+      'Stop when the upper arms are about parallel, or sooner if the shoulders complain.',
+      'Press back up through the heels of your hands.',
+    ],
+    cues: [
+      'Keep your back close to the chair — drifting forward puts the shoulder in a bad position.',
+      'Bend the knees and keep the feet close to make it easier; straighten the legs out to make it harder.',
+      'If you feel any pinch at the front of the shoulder, stop and use diamond push-ups instead.',
+    ],
+    mistakes: [
+      'Dropping too deep and stressing the shoulder joint.',
+      'Using a chair that can tip backwards.',
+    ],
+    videoQuery: 'bench dip chair triceps form',
+  },
+  {
+    id: 'step-up',
+    name: 'Dumbbell Step-Up',
+    equipment: ['dumbbells', 'chair'],
+    pattern: 'split-squat', load: 'dumbbell-pair', type: 'compound', unilateral: true,
+    primary: ['quads', 'glutes'], secondary: ['hamstrings', 'calves'],
+    reps: [10, 12], rest: 105,
+    setup: 'Stand facing a stable chair with a dumbbell in each hand. Use a lower surface if the seat is above knee height.',
+    steps: [
+      'Place one whole foot on the seat.',
+      'Drive through that heel to stand up, without pushing off the back foot.',
+      'Lower under control and repeat on the same leg.',
+    ],
+    cues: [
+      'The trailing leg should feel like a passenger. If it is pushing, the step is too high.',
+      'Chair against a wall, every time. This is the movement where a sliding chair actually hurts you.',
+    ],
+    mistakes: [
+      'Bouncing off the back foot.',
+      'A step so high the hip has to hitch to get up.',
+    ],
+    videoQuery: 'dumbbell step up form',
+  },
+  {
+    id: 'seated-db-press',
+    name: 'Seated Dumbbell Press',
+    equipment: ['dumbbells', 'chair'],
+    pattern: 'z-press', load: 'dumbbell-pair', type: 'compound',
+    primary: ['front-delts'], secondary: ['triceps', 'side-delts'],
+    reps: [8, 12], rest: 120,
+    setup: 'Sit tall on a chair with your back against the backrest, dumbbells at shoulder height.',
+    steps: [
+      'Press both dumbbells overhead to lockout.',
+      'Lower under control until the elbows drop just below shoulder height.',
+    ],
+    cues: [
+      'With the back supported you can press more than standing or from the floor, so this is your heaviest overhead option.',
+      'Keep the ribs down. A supported back makes it easy to arch without noticing.',
+    ],
+    mistakes: [
+      'Arching hard over the backrest, which turns it into an incline press.',
+      'Letting the elbows flare straight out to the sides.',
+    ],
+    videoQuery: 'seated dumbbell shoulder press form',
+  },
+  {
+    id: 'seated-curl',
+    name: 'Seated Dumbbell Curl',
+    equipment: ['dumbbells', 'chair'],
+    pattern: 'curl', load: 'dumbbell-pair', type: 'isolation',
+    primary: ['biceps'], secondary: ['forearms'],
+    reps: [10, 12], rest: 75,
+    setup: 'Sit on the edge of a chair, dumbbells hanging at your sides, back straight.',
+    steps: [
+      'Curl both dumbbells up, rotating the palms toward your shoulders.',
+      'Squeeze at the top.',
+      'Lower slowly to full extension.',
+    ],
+    cues: [
+      'Sitting removes the leg drive and body swing that creeps into a standing curl as you tire.',
+      'Let the arms hang slightly behind your torso for a stronger stretch at the bottom.',
+    ],
+    mistakes: [
+      'Rocking the torso back against the chair.',
+      'Cutting the bottom of the range short.',
+    ],
+    videoQuery: 'seated dumbbell curl form',
   },
 ];
 

@@ -1,6 +1,6 @@
 # Home Gym
 
-A guided workout web app built for one specific setup: **two loadable dumbbells, a loadable rod, light resistance bands, a mat — and no bench.**
+A guided workout web app built for one specific setup: **two loadable dumbbells, a loadable rod, light resistance bands, a mat, a chair — and no bench.**
 
 You open it, it tells you what to train today, and you press Start. It counts your sets, times your rest, shows you how each movement is performed, and works out what weight you should be lifting based on what you lifted last time.
 
@@ -45,6 +45,10 @@ The warm-up follows RAMP — Raise, Activate, Mobilise, Potentiate. Six or seven
 
 The cool-down is static stretching, 30 seconds a hold, per side where it matters, matched to the day. It sits *after* training and never before, because stretching a cold muscle measurably reduces force output for the session that follows, while the same work on warm tissue is where flexibility is actually gained.
 
+**A chair, not a bench.** A few movements are genuinely worse without support rather than just harder, so those use a sturdy chair: chest-supported reverse flyes and rows, hip thrusts, Bulgarian split squats, step-ups, decline and incline push-ups, chair dips, seated presses and curls. Everything else stays on the floor.
+
+**Bands are an accessory, not a substitute for load.** They are used where no weighted option exists — vertical pulls and knee-flexion hamstring work — and in warm-up activation and stretching, where they are genuinely the better tool: banded lateral walks to switch the hips on before squatting, a band round the foot to make the hamstring stretch something you can relax into, a band instead of the rod for shoulder pass-throughs. They never replace a dumbbell or the rod in a strength slot.
+
 **It knows your gear.** Tell Settings your rod weight, your loading ceilings and your smallest plate jumps. The app only ever suggests weights you can actually load, and when you hit the ceiling of what your equipment holds it stops asking for more weight and asks for more reps instead.
 
 ---
@@ -63,7 +67,7 @@ js/
   plan.js             session generation and the progression engine
   ui.js               DOM helpers, bottom sheets, toasts
   data/
-    exercises.js      the 101-exercise library
+    exercises.js      the 111-exercise library
     mobility.js       RAMP warm-ups and static stretch routines
     media.js          movement -> Free Exercise DB photo mapping
     plans.js          the 3, 4 and 5 day split templates

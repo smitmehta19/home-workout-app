@@ -120,6 +120,17 @@ export const PHOTO_IDS = {
   'weighted-crunch': 'Crunches',
   'pallof-press': 'Pallof_Press',
   'mountain-climber': 'Mountain_Climbers',
+  // chair-supported
+  'chair-reverse-flye': 'Seated_Bent-Over_Rear_Delt_Raise',
+  'chair-row': 'Dumbbell_Incline_Row',
+  'bulgarian-split-squat': 'One_Leg_Barbell_Squat',
+  'hip-thrust': 'Barbell_Hip_Thrust',
+  'decline-push-up': 'Decline_Push-Up',
+  'incline-push-up': 'Incline_Push-Up',
+  'chair-dip': 'Bench_Dips',
+  'step-up': 'Dumbbell_Step_Ups',
+  'seated-db-press': 'Seated_Dumbbell_Press',
+  'seated-curl': 'Seated_Dumbbell_Curl',
   'hollow-hold': 'Plank',
   'bird-dog': 'Dead_Bug',
   'wall-sit': 'Sit_Squats',
@@ -166,6 +177,8 @@ export const PHOTO_IDS = {
   'pass-through': 'Shoulder_Stretch',
   't-rotation': 'Torso_Rotation',
   'bird-dog-warm': 'Dead_Bug',
+  'band-walk-warm': 'Monster_Walk',
+  'band-hamstring': 'Lying_Hamstring',
 };
 
 // Movements with no exact entry in the photo library. The photograph shows the
@@ -175,7 +188,7 @@ export const APPROXIMATE = new Set([
   'hollow-hold', 'bird-dog', 'bird-dog-warm', 'wall-sit', 'waiter-walk', 'z-press',
   'bridge-press', 'pike-push-up', 'band-chest-press', 'band-pulldown', 'lateral-lunge',
   'cossack-squat', 'single-leg-rdl', 'march', 'scap-pushup', 'pass-through',
-  'suitcase-carry', 'heels-elevated-squat', 'pendlay-row', 'close-grip-floor-press',
+  'band-walk-warm', 'suitcase-carry', 'heels-elevated-squat', 'pendlay-row', 'close-grip-floor-press',
   'db-goblet-good-morning', 'db-rdl', 'split-squat', 'db-front-squat', 'db-swing',
   'db-thruster', 'turkish-get-up', 'db-windmill', 'band-lateral-walk', 'db-walking-lunge',
 ]);

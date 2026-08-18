@@ -37,48 +37,7 @@ This matters more at home than in a gym. With real plates your smallest jump mig
 
 ---
 
-## The no-bench constraint
 
-Every one of the 67 exercises is performable on the floor with your kit. There are no bench presses, no incline work, no dips, no pull-ups, nothing requiring a rack or a machine. Pressing is done with floor presses, push-up variations, Z-presses and standing overhead work. If a movement isn't in the library, the app can never prescribe it.
-
-## About the demos
-
-The animations are drawn, not filmed. Each movement is a small articulated figure posed with joint angles, eased between a start and an end position on a loop. That keeps the whole app under a megabyte, free of licensing problems, and working offline.
-
-They show you the shape of the movement, not the fine detail of technique. Every exercise page also has full written cues and common mistakes, plus a one-tap link to video demonstrations.
-
----
-
-## Running it
-
-There is no build step and no dependencies. It is plain HTML, CSS and ES modules.
-
-```bash
-# any static server will do
-npx http-server .
-# then open http://localhost:8080
-```
-
-To install it on your phone, open the deployed URL in your browser and choose "Add to Home Screen". It then launches full screen like a native app and works with no signal.
-
-### Deploying
-
-Push to `main` and the included GitHub Actions workflow publishes the site to GitHub Pages.
-
-Two things are worth knowing if you fork this or start it fresh:
-
-- **Pages must be switched on once by hand**: *Settings → Pages → Source → GitHub Actions*. The workflow asks to enable it automatically, but `GITHUB_TOKEN` cannot create a Pages site without repository admin rights and fails with *"Resource not accessible by integration"* until you flip that switch.
-- **Deploys only run from the default branch.** The `github-pages` environment GitHub creates rejects deployments from any other branch before the job starts. The workflow skips non-default branches rather than failing on them, and reads the default branch at run time, so it needs no edit if you change it.
-
----
-
-## Your data
-
-Everything is stored in `localStorage` in the browser you use it in. Nothing is transmitted anywhere.
-
-The trade-off is real: **clearing your browsing data erases your training history.** Settings has an Export button that saves a JSON backup, and a Restore button that reads one back. Use it occasionally.
-
----
 
 ## Project layout
 

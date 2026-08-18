@@ -86,3 +86,16 @@ It is a training tool, not medical advice. If you have an injury or a health con
 ## Credits
 
 Demonstration photographs come from the [Free Exercise DB](https://github.com/yuhonas/free-exercise-db), which publishes itself as public domain. They are linked from that project rather than redistributed here. Note that the project carries no LICENSE file at its root and the provenance of the photographs has been raised in its issue tracker, so if you fork this, satisfy yourself about the licensing or simply delete `js/data/media.js` — every movement then falls back to the drawn demonstration.
+
+## Tests
+
+```sh
+npm i -g playwright && playwright install chromium
+./tests/run.sh
+```
+
+Browser tests covering a full session end to end, the back gesture from every
+place a sheet can be opened, that guidance is never blank when the photo host
+is unreachable, and — the one that matters most — that a shipped change
+actually reaches someone who already has the app installed. See
+[`tests/README.md`](tests/README.md).

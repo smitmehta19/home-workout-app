@@ -5,6 +5,7 @@ import { h, toast, confirmSheet } from '../ui.js';
 import { getSettings, saveSettings, exportJSON, importJSON, resetAll, todayISO } from '../state.js';
 import { SPLITS } from '../data/plans.js';
 import { photoSources, MEDIA_CREDIT } from '../data/media.js';
+import { APP_VERSION } from '../version.js';
 
 function field(label, hint, control) {
   return h('div', { class: 'field' },
@@ -163,6 +164,8 @@ export function renderSettings(root, params, rerender) {
     ),
 
     h('p', { class: 'colophon' },
-      'Built for a home gym with two loadable dumbbells, a rod, bands and a mat. No bench required, anywhere.'),
+      'Built for a home gym with two loadable dumbbells, a rod, bands and a mat. No bench required, anywhere.',
+      h('br'),
+      h('span', { class: 'version' }, `Build ${APP_VERSION}`)),
   );
 }

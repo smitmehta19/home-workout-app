@@ -1,0 +1,13 @@
+{
+  "name": "home-workout-app",
+  "private": true,
+  "type": "module",
+  "description": "Guided home workout webapp. The app itself has no build step and no runtime dependencies; these are only for the browser tests.",
+  "scripts": {
+    "start": "npx http-server -p 8099 -s -c-1 .",
+    "test": "bash tests/run.sh"
+  },
+  "devDependencies": {
+    "playwright": "^1.56.0"
+  }
+}

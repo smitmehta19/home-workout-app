@@ -1,10 +1,19 @@
-// Offline support. The app shell is small and fully static, so it is cached on
-// install and served cache-first — the app then works with no signal at all,
-// which matters in a garage or basement.
+// Offline support.
 //
-// Bump CACHE when any shell file changes so returning visitors get the update.
+// The app shell is served NETWORK-FIRST with a short timeout, falling back to
+// cache. Cache-first was wrong here: it pinned returning visitors to whatever
+// version they first installed, so a fix could ship and never reach anyone
+// until the cache happened to turn over. Network-first means an online launch
+// always runs current code, and the timeout keeps it usable on a bad
+// connection — if the network has not answered in SHELL_TIMEOUT_MS the cached
+// copy is served instead, and with no signal at all it falls straight through
+// to cache.
+//
+// Photographs stay cache-first: their URLs are immutable, so a cached image is
+// always correct and re-fetching it would only cost bandwidth.
 
-const CACHE = 'home-gym-v2';
+const CACHE = 'home-gym-v3';
+const SHELL_TIMEOUT_MS = 2500;
 const PHOTOS = 'home-gym-photos-v2';
 
 // Demonstration photographs are fetched from the Free Exercise DB and cached on
@@ -22,6 +31,7 @@ const SHELL = [
   './icons/icon-maskable.svg',
   './js/app.js',
   './js/ui.js',
+  './js/version.js',
   './js/state.js',
   './js/plan.js',
   './js/data/exercises.js',
@@ -80,19 +90,21 @@ self.addEventListener('fetch', (event) => {
   if (url.origin !== self.location.origin) return; // let video links go to the network
 
   event.respondWith(
-    caches.match(request, { ignoreSearch: true }).then((cached) => {
-      // Serve from cache immediately, then quietly refresh it for next time.
-      const network = fetch(request)
-        .then((response) => {
-          if (response.ok) {
-            const copy = response.clone();
-            caches.open(CACHE).then((cache) => cache.put(request, copy));
-          }
-          return response;
-        })
-        .catch(() => cached ?? caches.match('./index.html'));
-
-      return cached ?? network;
-    }),
+    Promise.race([
+      fetch(request).then((response) => {
+        if (response.ok) {
+          const copy = response.clone();
+          caches.open(CACHE).then((cache) => cache.put(request, copy));
+        }
+        return response;
+      }),
+      new Promise((resolve, reject) => setTimeout(() => reject(new Error('slow')), SHELL_TIMEOUT_MS)),
+    ]).catch(() => caches.match(request, { ignoreSearch: true })
+      .then((cached) => cached ?? caches.match('./index.html'))),
   );
+});
+
+// Let the page ask for an immediate takeover after an update is found.
+self.addEventListener('message', (event) => {
+  if (event.data === 'skip-waiting') self.skipWaiting();
 });

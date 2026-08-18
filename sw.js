@@ -5,13 +5,13 @@
 // Bump CACHE when any shell file changes so returning visitors get the update.
 
 const CACHE = 'home-gym-v2';
-const PHOTOS = 'home-gym-photos-v1';
+const PHOTOS = 'home-gym-photos-v2';
 
 // Demonstration photographs are fetched from the Free Exercise DB and cached on
 // first view, so a movement you have already looked at still shows its photos
 // with no signal. They are never precached — that would be a large download for
 // images you may never open.
-const PHOTO_HOST = 'raw.githubusercontent.com';
+const PHOTO_HOSTS = new Set(['cdn.jsdelivr.net', 'raw.githubusercontent.com']);
 
 const SHELL = [
   './',
@@ -64,7 +64,7 @@ self.addEventListener('fetch', (event) => {
 
   const url = new URL(request.url);
 
-  if (url.hostname === PHOTO_HOST) {
+  if (PHOTO_HOSTS.has(url.hostname)) {
     // Cache-first, and never fall back to index.html for an image — a missing
     // photo must fail so the app can swap in the drawn figure instead.
     event.respondWith(

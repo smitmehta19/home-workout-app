@@ -144,7 +144,13 @@ export function sessionFor(dayIdx = weekdayIndex(), week = weekNumber()) {
   // step tells you exactly what to do a light set of.
   const warmup = warmupFor(day.name).map((item) =>
     item.phase === 'Potentiate'
-      ? { ...item, name: `Light set: ${exercises[0].exercise.name}`, pattern: exercises[0].exercise.pattern }
+      ? {
+          ...item,
+          name: `Light set: ${exercises[0].exercise.name}`,
+          pattern: exercises[0].exercise.pattern,
+          // Show that exercise's own photograph, not a generic one.
+          photoId: exercises[0].exercise.id,
+        }
       : item);
 
   return {

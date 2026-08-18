@@ -195,7 +195,7 @@ function renderPrep(root, session, save, rerender, phase) {
     renderStep(root, session, save, rerender);
   };
 
-  demoNode = createGuide(item.id, { pattern: item.pattern, alt: item.name });
+  demoNode = createGuide(item.id, { pattern: item.pattern, alt: item.name, photoId: item.photoId ?? null });
 
   const label = h('div', { class: 'countdown-value' }, item.seconds ? mmss(item.seconds) : `${item.reps}`);
   const ring = h('div', { class: `countdown-ring${isStretch ? ' is-stretch' : ''}` }, label);

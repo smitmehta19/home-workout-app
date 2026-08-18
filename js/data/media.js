@@ -16,7 +16,11 @@
 // Anything not listed here — or whose photo fails to load — falls back to the
 // drawn animation in components/figure.js, which always works offline.
 
-const BASE = 'https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises';
+// jsDelivr is a real CDN and is the primary source; raw.githubusercontent is
+// the same files but is not built for hotlinking and can be throttled, so it is
+// only used if the CDN request fails.
+const CDN = 'https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises';
+const RAW = 'https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises';
 
 export const MEDIA_CREDIT = {
   name: 'Free Exercise DB',
@@ -116,6 +120,22 @@ export const PHOTO_IDS = {
   'weighted-crunch': 'Crunches',
   'pallof-press': 'Pallof_Press',
   'mountain-climber': 'Mountain_Climbers',
+  'hollow-hold': 'Plank',
+  'bird-dog': 'Dead_Bug',
+  'wall-sit': 'Sit_Squats',
+  'waiter-walk': 'Farmers_Walk',
+  'z-press': 'Seated_Dumbbell_Press',
+  'squeeze-press': 'Close-Grip_Dumbbell_Press',
+  'bridge-press': 'Dumbbell_Floor_Press',
+  'pike-push-up': 'Handstand_Push-Ups',
+  'band-chest-press': 'Cable_Chest_Press',
+  'band-pulldown': 'Full_Range-Of-Motion_Lat_Pulldown',
+  'bb-high-pull': 'Clean_Pull',
+  'lateral-lunge': 'Barbell_Side_Split_Squat',
+  'cossack-squat': 'Barbell_Side_Split_Squat',
+  'db-wide-row': 'Barbell_Rear_Delt_Row',
+  'db-single-arm-press': 'Dumbbell_One-Arm_Shoulder_Press',
+  'single-leg-rdl': 'Kettlebell_One-Legged_Deadlift',
 
   // ── stretches ──
   'chest-wall': 'Chest_And_Front_Of_Shoulder_Stretch',
@@ -141,13 +161,34 @@ export const PHOTO_IDS = {
   'hip-9090': '90_90_Hamstring',
   'ankle-rock': 'Ankle_Circles',
   'worlds-greatest': 'Groiners',
+  'march': 'Jogging_Treadmill',
+  'scap-pushup': 'Pushups',
+  'pass-through': 'Shoulder_Stretch',
+  't-rotation': 'Torso_Rotation',
+  'bird-dog-warm': 'Dead_Bug',
 };
 
-export const hasPhotos = (id) => Boolean(PHOTO_IDS[id]);
+// Movements with no exact entry in the photo library. The photograph shows the
+// closest relative rather than the movement itself, so the detail sheet says so
+// instead of quietly implying the picture is the exercise.
+export const APPROXIMATE = new Set([
+  'hollow-hold', 'bird-dog', 'bird-dog-warm', 'wall-sit', 'waiter-walk', 'z-press',
+  'bridge-press', 'pike-push-up', 'band-chest-press', 'band-pulldown', 'lateral-lunge',
+  'cossack-squat', 'single-leg-rdl', 'march', 'scap-pushup', 'pass-through',
+  'suitcase-carry', 'heels-elevated-squat', 'pendlay-row', 'close-grip-floor-press',
+  'db-goblet-good-morning', 'db-rdl', 'split-squat', 'db-front-squat', 'db-swing',
+  'db-thruster', 'turkish-get-up', 'db-windmill', 'band-lateral-walk', 'db-walking-lunge',
+]);
 
-/** The two frames — start and end of the movement — for one of our ids. */
-export function photoUrls(id) {
+export const hasPhotos = (id) => Boolean(PHOTO_IDS[id]);
+export const isApproximate = (id) => APPROXIMATE.has(id);
+
+/**
+ * The two frames — start and end of the movement. Each carries a CDN url and a
+ * raw.githubusercontent url to retry with if the CDN fails.
+ */
+export function photoSources(id) {
   const key = PHOTO_IDS[id];
   if (!key) return null;
-  return [`${BASE}/${key}/0.jpg`, `${BASE}/${key}/1.jpg`];
+  return [0, 1].map((i) => ({ src: `${CDN}/${key}/${i}.jpg`, retry: `${RAW}/${key}/${i}.jpg` }));
 }

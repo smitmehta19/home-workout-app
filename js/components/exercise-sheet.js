@@ -6,15 +6,16 @@ import { h, openSheet, fmtWeight, relativeDate } from '../ui.js';
 import { createGuide } from './guide.js';
 import { videoUrl } from '../data/exercises.js';
 import { muscleName } from '../data/muscles.js';
-import { MEDIA_CREDIT, hasPhotos } from '../data/media.js';
+import { MEDIA_CREDIT, hasPhotos, isApproximate } from '../data/media.js';
 import { historyFor, bestE1RM, getSettings } from '../state.js';
 
 const searchUrl = (q) => `https://www.youtube.com/results?search_query=${encodeURIComponent(q)}`;
 
 const credit = (id) => hasPhotos(id)
   ? h('p', { class: 'credit' },
-      'Photographs from ',
-      h('a', { href: MEDIA_CREDIT.url, target: '_blank', rel: 'noopener' }, MEDIA_CREDIT.name))
+      isApproximate(id) ? 'Photograph shows the closest related movement, from ' : 'Photographs from ',
+      h('a', { href: MEDIA_CREDIT.url, target: '_blank', rel: 'noopener' }, MEDIA_CREDIT.name),
+      '. Read the steps above for this exact variation.')
   : h('p', { class: 'credit' }, 'Drawn demonstration — no photograph mapped for this movement yet.');
 
 export function openExercise(exercise) {
@@ -74,7 +75,7 @@ export function openExercise(exercise) {
 export function openDrill(item, kind = 'stretch') {
   let guide;
   openSheet(() => {
-    guide = createGuide(item.id, { pattern: item.pattern, alt: item.name });
+    guide = createGuide(item.id, { pattern: item.pattern, alt: item.name, photoId: item.photoId ?? null });
     const dose = item.seconds
       ? `${item.seconds} seconds${item.perSide ? ' each side' : ''}`
       : `${item.reps} reps${item.perSide ? ' each side' : ''}`;

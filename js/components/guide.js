@@ -10,7 +10,7 @@
 // mapped for that movement all end at the same place — the drawing, showing.
 
 import { createDemo, propFor } from './figure.js';
-import { photoUrls } from '../data/media.js';
+import { photoSources } from '../data/media.js';
 
 const FRAME_MS = 1600;
 
@@ -20,11 +20,11 @@ const FRAME_MS = 1600;
  * @param {string} opts.pattern   pattern name when there is no exercise record
  * Returns an element with a `.stop()` method — call it when removing the node.
  */
-export function createGuide(id, { exercise = null, pattern = null, alt = '' } = {}) {
+export function createGuide(id, { exercise = null, pattern = null, alt = '', photoId = null } = {}) {
   const drawn = createDemo(pattern ?? exercise?.pattern ?? 'carry', exercise ? propFor(exercise) : 'none');
-  const urls = photoUrls(id);
+  const sources = photoSources(photoId ?? id);
 
-  if (!urls) return drawn;
+  if (!sources) return drawn;
 
   const wrap = document.createElement('div');
   wrap.className = 'guide is-drawn';
@@ -55,17 +55,23 @@ export function createGuide(id, { exercise = null, pattern = null, alt = '' } = 
     }, FRAME_MS);
   };
 
-  const imgs = urls.map((src, i) => {
+  const imgs = sources.map((source, i) => {
     const img = document.createElement('img');
     img.alt = i === 0 ? `${alt} — start position` : `${alt} — end position`;
     img.className = `guide-img${i === 0 ? ' is-on' : ''}`;
     img.decoding = 'async';
+    let triedRetry = false;
     // Listeners go on before src: a cached or instantly failing request can
     // fire before a handler added afterwards would ever see it.
-    img.addEventListener('load', () => { if (++loaded === urls.length) reveal(); }, { once: true });
-    // On failure we simply never reveal — the drawing is already on screen.
-    img.addEventListener('error', () => {}, { once: true });
-    img.src = src;
+    img.addEventListener('load', () => { if (++loaded === sources.length) reveal(); });
+    img.addEventListener('error', () => {
+      // CDN failed — try the origin once. If that fails too we simply never
+      // reveal, and the drawing already on screen stays.
+      if (triedRetry) return;
+      triedRetry = true;
+      img.src = source.retry;
+    });
+    img.src = source.src;
     return img;
   });
   wrap.append(...imgs);

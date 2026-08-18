@@ -4,6 +4,7 @@
 import { h, toast, confirmSheet } from '../ui.js';
 import { getSettings, saveSettings, exportJSON, importJSON, resetAll, todayISO } from '../state.js';
 import { SPLITS } from '../data/plans.js';
+import { photoSources, MEDIA_CREDIT } from '../data/media.js';
 
 function field(label, hint, control) {
   return h('div', { class: 'field' },
@@ -36,6 +37,37 @@ function toggle(key, label) {
       onchange: (e) => { saveSettings({ [key]: e.target.checked }); toast('Saved'); },
     }),
   );
+}
+
+/**
+ * Live check that the demonstration photographs are actually reachable. If they
+ * are not, the app silently shows drawn figures instead — this says so out loud
+ * rather than leaving you wondering why.
+ */
+function photoStatus() {
+  const row = h('div', { class: 'switch-row' },
+    h('span', {}, 'Demonstration photos'),
+    h('span', { class: 'muted small' }, 'checking…'),
+  );
+  const set = (text, cls) => row.replaceChildren(
+    h('span', {}, 'Demonstration photos'),
+    h('span', { class: `small ${cls}` }, text),
+  );
+
+  const [first] = photoSources('bb-deadlift');
+  const probe = (url, label, next) => {
+    const img = new Image();
+    let settled = false;
+    const done = (fn) => { if (!settled) { settled = true; fn(); } };
+    img.addEventListener('load', () => done(() => set(`loading from ${label}`, 'ok-text')));
+    img.addEventListener('error', () => done(next));
+    setTimeout(() => done(next), 8000);
+    img.src = url;
+  };
+  probe(first.src, 'the CDN', () =>
+    probe(first.retry, 'GitHub', () =>
+      set('unreachable — showing drawings', 'warn-text')));
+  return row;
 }
 
 export function renderSettings(root, params, rerender) {
@@ -94,6 +126,15 @@ export function renderSettings(root, params, rerender) {
       field('Most one dumbbell can hold', 'Per dumbbell, including the handle.', numberInput('dumbbellMax', { step: 1 })),
       field('Smallest rod jump', 'One plate on each side. With 1.25 kg plates that is 2.5 kg.', numberInput('barbellIncrement', { step: 0.25 })),
       field('Smallest dumbbell jump', 'Per dumbbell. Whatever your smallest pair of plates adds.', numberInput('dumbbellIncrement', { step: 0.25 })),
+    ),
+
+    h('section', { class: 'card' },
+      h('h3', {}, 'Demonstrations'),
+      photoStatus(),
+      h('p', { class: 'muted small' },
+        'Photographs come from the Free Exercise DB and are cached after you first view them. '
+        + 'If they cannot be reached, every movement falls back to a drawn figure, which always works offline.'),
+      h('a', { class: 'btn btn-ghost', href: MEDIA_CREDIT.url, target: '_blank', rel: 'noopener' }, 'About the photo library ↗'),
     ),
 
     h('section', { class: 'card' },

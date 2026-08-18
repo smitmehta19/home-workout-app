@@ -22,11 +22,18 @@ permissions:
 
 concurrency:
   group: pages
-  cancel-in-progress: true
+  # Do not cancel in flight. Pushing the same commit to two branches used to
+  # start two runs in this group, and the second killed the first mid-deploy.
+  cancel-in-progress: false
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    # The `github-pages` environment only accepts deployments from the default
+    # branch, so a run on any other branch is rejected before it starts. Skip
+    # those instead, which keeps them grey rather than red and means this needs
+    # no edit whenever the default branch changes.
+    if: github.ref_name == github.event.repository.default_branch
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}

@@ -65,7 +65,10 @@ To install it on your phone, open the deployed URL in your browser and choose "A
 
 Push to `main` and the included GitHub Actions workflow publishes the site to GitHub Pages.
 
-Pages has to be switched on once by hand before the first deploy can succeed: **Settings → Pages → Source → GitHub Actions**. The workflow asks to enable it automatically, but `GITHUB_TOKEN` is not permitted to create a Pages site without repository admin rights, so it fails with *"Resource not accessible by integration"* until you flip that switch. Afterwards every push to `main` deploys on its own.
+Two things are worth knowing if you fork this or start it fresh:
+
+- **Pages must be switched on once by hand**: *Settings → Pages → Source → GitHub Actions*. The workflow asks to enable it automatically, but `GITHUB_TOKEN` cannot create a Pages site without repository admin rights and fails with *"Resource not accessible by integration"* until you flip that switch.
+- **Deploys only run from the default branch.** The `github-pages` environment GitHub creates rejects deployments from any other branch before the job starts. The workflow skips non-default branches rather than failing on them, and reads the default branch at run time, so it needs no edit if you change it.
 
 ---
 

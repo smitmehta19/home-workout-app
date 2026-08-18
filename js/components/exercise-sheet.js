@@ -18,15 +18,62 @@ const credit = (id) => hasPhotos(id)
       '. Read the steps above for this exact variation.')
   : h('p', { class: 'credit' }, 'Drawn demonstration — no photograph mapped for this movement yet.');
 
-export function openExercise(exercise) {
+/**
+ * Open an exercise. Pass `list` and `index` and the sheet gains next/previous
+ * controls, so you can walk the whole session or muscle group without closing
+ * and reopening — swipe sideways, use the arrows, or press left/right.
+ */
+export function openExercise(exercise, { list = null, index = 0 } = {}) {
+  const items = list?.length ? list : [exercise];
+  let at = list?.length ? index : 0;
   let guide;
-  openSheet(() => {
-    guide = createGuide(exercise.id, { exercise, alt: exercise.name });
+  let sheet;
+
+  const go = (delta) => {
+    const next = at + delta;
+    if (next < 0 || next >= items.length) return;
+    at = next;
+    guide?.stop?.();
+    sheet.setContent(render());
+  };
+
+  const render = () => {
+    const current = items[at];
+    guide = createGuide(current.id, { exercise: current, alt: current.name });
+    return body(current, items.length > 1 ? { at, total: items.length, go } : null, guide);
+  };
+
+  sheet = openSheet(() => render(), {
+    onClose: () => guide?.stop?.(),
+    onPrev: () => go(-1),
+    onNext: () => go(1),
+  });
+  return sheet;
+}
+
+function pager(nav) {
+  if (!nav) return null;
+  return h('nav', { class: 'sheet-pager' },
+    h('button', {
+      class: 'pager-btn', disabled: nav.at === 0, 'aria-label': 'Previous exercise',
+      onclick: () => nav.go(-1),
+    }, '‹'),
+    h('span', { class: 'pager-count' }, `${nav.at + 1} of ${nav.total}`),
+    h('button', {
+      class: 'pager-btn', disabled: nav.at === nav.total - 1, 'aria-label': 'Next exercise',
+      onclick: () => nav.go(1),
+    }, '›'),
+  );
+}
+
+function body(exercise, nav, guide) {
+  {
     const unit = getSettings().unit;
     const history = historyFor(exercise.id).slice(-5).reverse();
     const best = bestE1RM(exercise.id);
 
     return h('article', { class: 'ex-detail' },
+      pager(nav),
       h('div', { class: 'guide-hero' }, guide),
       h('header', {},
         h('h2', {}, exercise.name),
@@ -67,25 +114,49 @@ export function openExercise(exercise) {
       h('a', { class: 'btn btn-ghost btn-block', href: videoUrl(exercise), target: '_blank', rel: 'noopener' },
         'Watch a video demonstration ↗'),
       credit(exercise.id),
+      nav && h('div', { class: 'pager-foot' },
+        h('button', { class: 'btn btn-ghost', disabled: nav.at === 0, onclick: () => nav.go(-1) }, '‹ Previous'),
+        h('button', { class: 'btn btn-ghost', disabled: nav.at === nav.total - 1, onclick: () => nav.go(1) }, 'Next ›'),
+      ),
     );
-  }, { onClose: () => guide?.stop?.() });
+  }
 }
 
 /** The same treatment for a warm-up drill or a stretch. */
-export function openDrill(item, kind = 'stretch') {
+export function openDrill(item, kind = 'stretch', { list = null, index = 0 } = {}) {
+  const items = list?.length ? list : [item];
+  let at = list?.length ? index : 0;
   let guide;
-  openSheet(() => {
+  let sheet;
+
+  const go = (delta) => {
+    const next = at + delta;
+    if (next < 0 || next >= items.length) return;
+    at = next;
+    guide?.stop?.();
+    sheet.setContent(drillBody(items[at], kind, items.length > 1 ? { at, total: items.length, go } : null));
+  };
+
+  sheet = openSheet(() => drillBody(items[at], kind, items.length > 1 ? { at, total: items.length, go } : null), {
+    onClose: () => guide?.stop?.(),
+    onPrev: () => go(-1),
+    onNext: () => go(1),
+  });
+  return sheet;
+
+  function drillBody(item, kind2, nav) {
     guide = createGuide(item.id, { pattern: item.pattern, alt: item.name, photoId: item.photoId ?? null });
     const dose = item.seconds
       ? `${item.seconds} seconds${item.perSide ? ' each side' : ''}`
       : `${item.reps} reps${item.perSide ? ' each side' : ''}`;
 
     return h('article', { class: 'ex-detail' },
+      pager(nav),
       h('div', { class: 'guide-hero' }, guide),
       h('header', {},
         h('h2', {}, item.name),
         h('div', { class: 'chips' },
-          h('span', { class: 'chip' }, kind === 'stretch' ? 'Stretch' : item.phase),
+          h('span', { class: 'chip' }, kind2 === 'stretch' ? 'Stretch' : item.phase),
           h('span', { class: 'chip chip-quiet' }, dose),
         ),
       ),
@@ -97,13 +168,17 @@ export function openDrill(item, kind = 'stretch') {
       item.avoid?.length > 0 && h('section', {}, h('h3', {}, 'Avoid'),
         h('ul', { class: 'mistakes' }, item.avoid.map((m) => h('li', {}, m)))),
 
-      kind === 'stretch' && h('p', { class: 'muted small' },
+      kind2 === 'stretch' && h('p', { class: 'muted small' },
         'Ease to the point of mild tension and hold there, breathing normally. It should never be sharp. '
         + 'Stretching is done after training, on warm muscle, which is when it actually improves flexibility.'),
 
       h('a', { class: 'btn btn-ghost btn-block', href: searchUrl(`how to ${item.name} form`), target: '_blank', rel: 'noopener' },
         'Watch a video demonstration ↗'),
       credit(item.id),
+      nav && h('div', { class: 'pager-foot' },
+        h('button', { class: 'btn btn-ghost', disabled: nav.at === 0, onclick: () => nav.go(-1) }, '‹ Previous'),
+        h('button', { class: 'btn btn-ghost', disabled: nav.at === nav.total - 1, onclick: () => nav.go(1) }, 'Next ›'),
+      ),
     );
-  }, { onClose: () => guide?.stop?.() });
+  }
 }

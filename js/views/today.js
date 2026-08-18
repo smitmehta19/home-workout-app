@@ -28,8 +28,9 @@ function weekStrip(activeIdx) {
   );
 }
 
-function exerciseRow(item, index) {
+function exerciseRow(item, index, all) {
   const { slot, exercise, suggestion } = item;
+  const list = all.map((e) => e.exercise);
   const unit = getSettings().unit;
   const target = exercise.timed
     ? `${slot.sets} × ${suggestion.reps}s`
@@ -43,7 +44,7 @@ function exerciseRow(item, index) {
       ? `start ~${suggestion.weight} ${unit}`
       : `${suggestion.weight} ${unit}`;
 
-  return h('li', { class: 'ex-row', onclick: () => openExercise(exercise) },
+  return h('li', { class: 'ex-row', onclick: () => openExercise(exercise, { list, index }) },
     h('span', { class: 'ex-index' }, index + 1),
     h('div', { class: 'ex-main' },
       h('span', { class: 'ex-name' }, exercise.name),
@@ -121,22 +122,22 @@ export function renderToday(root) {
       active && h('p', { class: 'note' }, 'You have a workout in progress.'),
       h('a', { class: 'btn btn-primary btn-block btn-start', href: `#/workout?day=${dayIdx}` },
         active ? 'Resume workout' : 'Start workout'),
-      h('ol', { class: 'ex-list' }, session.exercises.map(exerciseRow)),
+      h('ol', { class: 'ex-list' }, session.exercises.map((it, i) => exerciseRow(it, i, session.exercises))),
       // Warm-up and stretching are shown as fixed parts of the session, not as
       // something to fold away and forget.
       h('div', { class: 'bookends' },
         h('div', { class: 'bookend' },
           h('span', { class: 'bookend-tag' }, 'Always first'),
           h('strong', {}, `Warm-up · ${session.warmup.length} drills`),
-          h('div', { class: 'drill-chips' }, session.warmup.map((w) =>
-            h('button', { class: 'drill-chip', onclick: () => openDrill(w, 'warmup') },
+          h('div', { class: 'drill-chips' }, session.warmup.map((w, wi) =>
+            h('button', { class: 'drill-chip', onclick: () => openDrill(w, 'warmup', { list: session.warmup, index: wi }) },
               w.name.replace(/^Light set: .*/, 'Ramp-up set')))),
         ),
         h('div', { class: 'bookend' },
           h('span', { class: 'bookend-tag' }, 'Always last'),
           h('strong', {}, `Stretching · ${session.cooldown.length} holds`),
-          h('div', { class: 'drill-chips' }, session.cooldown.map((c) =>
-            h('button', { class: 'drill-chip', onclick: () => openDrill(c, 'stretch') }, c.name))),
+          h('div', { class: 'drill-chips' }, session.cooldown.map((c, ci) =>
+            h('button', { class: 'drill-chip', onclick: () => openDrill(c, 'stretch', { list: session.cooldown, index: ci }) }, c.name))),
         ),
       ),
     );

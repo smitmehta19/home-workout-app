@@ -156,7 +156,7 @@ export function renderHistory(root, params) {
     bests.length > 0 && h('section', { class: 'card' },
       h('h3', {}, 'Personal bests'),
       h('p', { class: 'muted small' }, 'Estimated one-rep max, calculated with the Epley formula.'),
-      h('ul', { class: 'pb-list' }, bests.map((b) => h('li', { onclick: () => openExercise(b.exercise) },
+      h('ul', { class: 'pb-list' }, bests.map((b, i) => h('li', { onclick: () => openExercise(b.exercise, { list: bests.map((x) => x.exercise), index: i }) },
         h('span', { class: 'ex-name' }, b.exercise.name),
         h('span', {},
           h('strong', {}, `${Math.round(b.e1rm * 2) / 2} ${unit}`),

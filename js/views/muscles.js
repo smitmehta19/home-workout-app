@@ -12,9 +12,9 @@ import { bestE1RM, getSettings } from '../state.js';
 let view = 'front';
 let selected = null;
 
-function exerciseCard(exercise, tag) {
+function exerciseCard(exercise, tag, list, index) {
   const best = bestE1RM(exercise.id);
-  return h('li', { class: 'pick-row', onclick: () => openExercise(exercise) },
+  return h('li', { class: 'pick-row', onclick: () => openExercise(exercise, { list, index }) },
     h('div', { class: 'ex-main' },
       h('span', { class: 'ex-name' }, exercise.name),
       h('span', { class: 'ex-slot' },
@@ -35,6 +35,9 @@ function resultsFor(muscleId) {
 
   const info = MUSCLES[muscleId];
   const { primary, secondary } = exercisesForMuscle(muscleId);
+  // One continuous list, so paging runs straight from the direct work into the
+  // assistance work rather than stopping at the section break.
+  const all = [...primary, ...secondary];
   const volume = weeklyVolume()[muscleId] ?? 0;
 
   return h('div', { class: 'muscle-results' },
@@ -48,11 +51,11 @@ function resultsFor(muscleId) {
     ),
     primary.length > 0 && h('section', {},
       h('h3', {}, 'Trains it directly'),
-      h('ul', { class: 'pick-list' }, primary.map((e) => exerciseCard(e, 'primary'))),
+      h('ul', { class: 'pick-list' }, primary.map((e, i) => exerciseCard(e, 'primary', all, i))),
     ),
     secondary.length > 0 && h('section', {},
       h('h3', {}, 'Also works it'),
-      h('ul', { class: 'pick-list' }, secondary.map((e) => exerciseCard(e, 'secondary'))),
+      h('ul', { class: 'pick-list' }, secondary.map((e, i) => exerciseCard(e, 'secondary', all, primary.length + i))),
     ),
     primary.length === 0 && secondary.length === 0 && h('p', { class: 'muted' }, 'No exercises tagged for this muscle yet.'),
   );

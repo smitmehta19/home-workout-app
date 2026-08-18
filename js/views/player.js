@@ -101,7 +101,7 @@ function renderPreview(root, plan, dayIdx) {
     ),
     h('section', { class: 'card' },
       h('h3', {}, `Warm-up · ${plan.warmup.length} drills`),
-      h('ul', { class: 'prep-list' }, plan.warmup.map((i) => h('li', { onclick: () => openDrill(i, 'warmup') },
+      h('ul', { class: 'prep-list' }, plan.warmup.map((i, ix) => h('li', { onclick: () => openDrill(i, 'warmup', { list: plan.warmup, index: ix }) },
         h('span', { class: 'prep-phase' }, i.phase),
         h('span', {}, i.name),
         h('span', { class: 'muted' }, i.seconds ? `${i.seconds}s` : `${i.reps}${i.perSide ? '/side' : ''}`),
@@ -110,7 +110,7 @@ function renderPreview(root, plan, dayIdx) {
     h('section', { class: 'card' },
       h('h3', {}, 'Workout'),
       h('ol', { class: 'ex-list' }, plan.exercises.map(({ slot, exercise, suggestion }, i) =>
-        h('li', { class: 'ex-row', onclick: () => openExercise(exercise) },
+        h('li', { class: 'ex-row', onclick: () => openExercise(exercise, { list: plan.exercises.map((e) => e.exercise), index: i }) },
           h('span', { class: 'ex-index' }, i + 1),
           h('div', { class: 'ex-main' },
             h('span', { class: 'ex-name' }, exercise.name),
@@ -124,7 +124,7 @@ function renderPreview(root, plan, dayIdx) {
     ),
     h('section', { class: 'card' },
       h('h3', {}, `Stretching · ${plan.cooldown.length} holds`),
-      h('ul', { class: 'prep-list' }, plan.cooldown.map((i) => h('li', { onclick: () => openDrill(i, 'stretch') },
+      h('ul', { class: 'prep-list' }, plan.cooldown.map((i, ix) => h('li', { onclick: () => openDrill(i, 'stretch', { list: plan.cooldown, index: ix }) },
         h('span', { class: 'prep-phase' }, 'Hold'),
         h('span', {}, i.name),
         h('span', { class: 'muted' }, `${i.seconds}s${i.perSide ? '/side' : ''}`),
@@ -204,12 +204,12 @@ function renderPrep(root, session, save, rerender, phase) {
     h('span', { class: `pip-dot${it.done ? ' is-done' : ''}${i === idx ? ' is-current' : ''}` })));
 
   root.replaceChildren(h('div', { class: 'player' },
-    playerHeader(session, () => openDrill(item, isStretch ? 'stretch' : 'warmup')),
+    playerHeader(session, () => openDrill(item, isStretch ? 'stretch' : 'warmup', { list: items, index: idx })),
     h('div', { class: 'prep' },
       h('p', { class: 'eyebrow' },
         isStretch ? 'Cool-down · stretch' : `Warm-up · ${item.phase}`,
         ` · ${idx + 1} of ${items.length}`),
-      h('h1', { class: 'prep-title', onclick: () => openDrill(item, isStretch ? 'stretch' : 'warmup') }, item.name),
+      h('h1', { class: 'prep-title', onclick: () => openDrill(item, isStretch ? 'stretch' : 'warmup', { list: items, index: idx }) }, item.name),
       sideLabel && h('p', { class: 'prep-side' }, sideLabel),
       h('div', { class: 'prep-demo' }, demoNode),
       ring,
@@ -265,6 +265,11 @@ function renderWork(root, session, save, rerender) {
       ),
     );
 
+  const openWorkExercise = () => openExercise(exercise, {
+    list: session.entries.map((e) => byId[e.exerciseId]).filter(Boolean),
+    index: exIdx,
+  });
+
   const completeSet = () => {
     set.done = true;
     beep(760, 0.12);
@@ -294,7 +299,7 @@ function renderWork(root, session, save, rerender) {
 
   const body = h('div', { class: 'player-body' },
     h('p', { class: 'eyebrow' }, `${entry.slotLabel} · exercise ${exIdx + 1} of ${session.entries.length}`),
-    h('h1', { class: 'player-title', onclick: () => openExercise(exercise) }, exercise.name),
+    h('h1', { class: 'player-title', onclick: () => openWorkExercise() }, exercise.name),
     h('div', { class: 'player-demo' }, demoNode),
 
     setIdx === 0 && entry.note && h('p', { class: 'note note-coach' }, entry.note),
@@ -335,7 +340,7 @@ function renderWork(root, session, save, rerender) {
   );
 
   root.replaceChildren(h('div', { class: 'player' },
-    playerHeader(session, () => openExercise(exercise)), body));
+    playerHeader(session, openWorkExercise), body));
 }
 
 // ── timed holds inside the working sets ─────────────────────────────────────

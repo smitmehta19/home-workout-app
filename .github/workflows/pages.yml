@@ -5,7 +5,14 @@ name: Deploy to GitHub Pages
 
 on:
   push:
-    branches: [main]
+    # GitHub's auto-created `github-pages` environment only accepts deployments
+    # from the repository's DEFAULT branch. This repo's default is still the
+    # branch it was first pushed with, so deploying from `main` alone is
+    # rejected before the job even starts. Listing both keeps deploys working
+    # now and continues to work if the default is later moved to `main`.
+    branches:
+      - main
+      - claude/home-workout-webapp-15b8uf
   workflow_dispatch:
 
 permissions:

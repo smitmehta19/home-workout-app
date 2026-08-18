@@ -121,6 +121,25 @@ export const PATTERNS = {
                     stand({ hip: [104, 124], torso: 74, thigh: 14, shin: -22, arm: -6 }), 1.4],
   'single-leg-rdl':[stand({ torso: 4, thigh: 2, shin: 0 }),
                     stand({ hip: [104, 124], torso: 82, thigh: -62, shin: 0, arm: -6 }), 1.5],
+
+  // Arms opening out to the sides, seen head-on. Covers band pull-aparts,
+  // external rotation and the shoulder mobility drills.
+  'pull-apart':    [front({ arm: 88, fore: 62 }), front({ arm: 88, fore: 2 }), 1.1],
+  // Wide stance dropping straight down — plie and sumo squats, lateral lunges,
+  // Cossack squats and the adductor stretches.
+  'wide-squat':    [front({ hip: [100, 118], thigh: 26, shin: -26 }),
+                    front({ hip: [100, 143], thigh: 56, shin: -58 }), 1.3],
+  // Hip snap: hinged with the arms hanging back, driving to standing.
+  'swing':         [stand({ hip: [100, 126], torso: 58, thigh: 18, shin: -28, arm: -36, fore: 0 }),
+                    stand({ torso: 2, thigh: 0, shin: 0, arm: 88, fore: 0 }), 0.85],
+  // Squat straight into an overhead press.
+  'thruster':      [stand({ hip: [94, 148], torso: 22, thigh: 62, shin: -96, arm: 150, fore: 70 }),
+                    stand({ torso: 2, thigh: 2, shin: 0, arm: 179, fore: 0 }), 1.3],
+  // Rolling up from flat onto a propped elbow.
+  'get-up':        [lying({ arm: -180, fore: 0, thigh: -135, shin: 90 }),
+                    lying({ torso: 56, arm: -184, fore: 0, thigh: -122, shin: 82 }), 1.5],
+  // Torso tilting sideways, seen head-on.
+  'side-bend':     [front({ torso: -2, arm: 3 }), front({ torso: 22, arm: 3 }), 1.1],
 };
 
 /** Which prop to draw in the hands, derived from how the exercise is loaded. */

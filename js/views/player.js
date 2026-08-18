@@ -1,5 +1,9 @@
-// The guided workout. Press start and this walks you through every set: what
-// to lift, how many reps to chase, when to rest and when to go again.
+// The guided workout. Press start and this walks you through the whole session:
+// the RAMP warm-up, every working set, then the stretch routine.
+//
+// Warm-up and cool-down are phases of the session, not optional extras — you
+// move through them the same way you move through the working sets, and the
+// summary reports whether you finished them.
 
 import { h, toast, confirmSheet, fmtWeight } from '../ui.js';
 import { sessionFor, estimateMinutes, incrementFor } from '../plan.js';
@@ -24,6 +28,13 @@ export function teardownWorkout() {
   screenLock.release();
 }
 
+function stopTransient() {
+  countdown?.stop();
+  countdown = null;
+  demoNode?.stop?.();
+  demoNode = null;
+}
+
 function buildSession(dayIdx) {
   const plan = sessionFor(dayIdx);
   if (plan.rest) return null;
@@ -34,6 +45,8 @@ function buildSession(dayIdx) {
     dayName: plan.day.name,
     focus: plan.day.focus,
     startedAt: Date.now(),
+    warmup: plan.warmup.map((i) => ({ ...i, done: false })),
+    cooldown: plan.cooldown.map((i) => ({ ...i, done: false })),
     entries: plan.exercises.map(({ slot, exercise, suggestion }) => ({
       exerciseId: exercise.id,
       slotLabel: slot.label,
@@ -45,7 +58,7 @@ function buildSession(dayIdx) {
         done: false,
       })),
     })),
-    cursor: { ex: 0, set: 0 },
+    cursor: { phase: 'warmup', idx: 0, set: 0, side: 0 },
   };
 }
 
@@ -66,7 +79,7 @@ export function renderWorkout(root, params, rerender) {
   if (preview) return renderPreview(root, plan, dayIdx);
 
   const existing = getActive();
-  const session = existing && existing.dayIdx === dayIdx && existing.date === todayISO()
+  const session = existing && existing.dayIdx === dayIdx && existing.date === todayISO() && existing.warmup
     ? existing
     : buildSession(dayIdx);
 
@@ -84,9 +97,18 @@ function renderPreview(root, plan, dayIdx) {
     h('header', { class: 'page-head' },
       h('a', { class: 'back-link', href: '#/' }, '← Today'),
       h('h1', {}, plan.day.name),
-      h('p', { class: 'muted' }, `${plan.day.focus} · ~${estimateMinutes(plan)} min`),
+      h('p', { class: 'muted' }, `${plan.day.focus} · ~${estimateMinutes(plan)} min including warm-up and stretching`),
     ),
     h('section', { class: 'card' },
+      h('h3', {}, `Warm-up · ${plan.warmup.length} drills`),
+      h('ul', { class: 'prep-list' }, plan.warmup.map((i) => h('li', {},
+        h('span', { class: 'prep-phase' }, i.phase),
+        h('span', {}, i.name),
+        h('span', { class: 'muted' }, i.seconds ? `${i.seconds}s` : `${i.reps}${i.perSide ? '/side' : ''}`),
+      ))),
+    ),
+    h('section', { class: 'card' },
+      h('h3', {}, 'Workout'),
       h('ol', { class: 'ex-list' }, plan.exercises.map(({ slot, exercise, suggestion }, i) =>
         h('li', { class: 'ex-row', onclick: () => openExercise(exercise) },
           h('span', { class: 'ex-index' }, i + 1),
@@ -99,50 +121,154 @@ function renderPreview(root, plan, dayIdx) {
             h('span', { class: 'muted' }, suggestion.loaded ? `${suggestion.weight} ${getSettings().unit}` : 'bodyweight'),
           ),
         ))),
-      h('a', { class: 'btn btn-primary btn-block', href: `#/workout?day=${dayIdx}` }, 'Start this workout'),
     ),
+    h('section', { class: 'card' },
+      h('h3', {}, `Stretching · ${plan.cooldown.length} holds`),
+      h('ul', { class: 'prep-list' }, plan.cooldown.map((i) => h('li', {},
+        h('span', { class: 'prep-phase' }, 'Hold'),
+        h('span', {}, i.name),
+        h('span', { class: 'muted' }, `${i.seconds}s${i.perSide ? '/side' : ''}`),
+      ))),
+    ),
+    h('a', { class: 'btn btn-primary btn-block', href: `#/workout?day=${dayIdx}` }, 'Start this workout'),
   );
 }
 
-// ── the working screen ──────────────────────────────────────────────────────
+// ── dispatch ────────────────────────────────────────────────────────────────
 function renderStep(root, session, save, rerender) {
-  countdown?.stop();
-  countdown = null;
-  demoNode?.stop?.();
+  stopTransient();
+  const { phase } = session.cursor;
+  if (phase === 'warmup') return renderPrep(root, session, save, rerender, 'warmup');
+  if (phase === 'cooldown') return renderPrep(root, session, save, rerender, 'cooldown');
+  if (phase === 'done') return renderSummary(root, session, rerender);
+  return renderWork(root, session, save, rerender);
+}
 
-  const { ex: exIdx, set: setIdx } = session.cursor;
+function overallProgress(session) {
+  const total = session.warmup.length + session.cooldown.length
+    + session.entries.reduce((n, e) => n + e.sets.length, 0);
+  const done = session.warmup.filter((i) => i.done).length
+    + session.cooldown.filter((i) => i.done).length
+    + session.entries.reduce((n, e) => n + e.sets.filter((s) => s.done).length, 0);
+  return { done, total };
+}
 
-  if (exIdx >= session.entries.length) return renderSummary(root, session, rerender);
+function playerHeader(session, onInfo) {
+  const { done, total } = overallProgress(session);
+  return h('header', { class: 'player-head' },
+    h('a', { class: 'icon-btn', href: '#/', title: 'Leave workout', onclick: teardownWorkout }, '✕'),
+    h('div', { class: 'player-progress' },
+      h('div', { class: 'bar' }, h('div', { class: 'bar-fill', style: { width: `${(done / total) * 100}%` } })),
+      h('span', {}, `${done} / ${total}`),
+    ),
+    onInfo
+      ? h('button', { class: 'icon-btn', title: 'Exercise detail', onclick: onInfo }, 'ⓘ')
+      : h('span', { class: 'icon-btn is-ghost' }, ''),
+  );
+}
+
+// ── warm-up and stretching ──────────────────────────────────────────────────
+function renderPrep(root, session, save, rerender, phase) {
+  const items = session[phase];
+  const { idx, side } = session.cursor;
+
+  if (idx >= items.length) {
+    session.cursor = phase === 'warmup'
+      ? { phase: 'work', idx: 0, set: 0, side: 0 }
+      : { phase: 'done', idx: 0, set: 0, side: 0 };
+    save();
+    return renderStep(root, session, save, rerender);
+  }
+
+  const item = items[idx];
+  const isStretch = phase === 'cooldown';
+  const sideLabel = item.perSide ? (side === 0 ? 'Left side' : 'Right side') : null;
+
+  const advance = () => {
+    if (item.perSide && side === 0) {
+      session.cursor = { ...session.cursor, side: 1 };
+    } else {
+      item.done = true;
+      session.cursor = { phase, idx: idx + 1, set: 0, side: 0 };
+    }
+    save();
+    renderStep(root, session, save, rerender);
+  };
+
+  demoNode = createDemo(item.pattern, 'none');
+
+  const label = h('div', { class: 'countdown-value' }, item.seconds ? mmss(item.seconds) : `${item.reps}`);
+  const ring = h('div', { class: `countdown-ring${isStretch ? ' is-stretch' : ''}` }, label);
+
+  const pips = h('div', { class: 'prep-pips' }, items.map((it, i) =>
+    h('span', { class: `pip-dot${it.done ? ' is-done' : ''}${i === idx ? ' is-current' : ''}` })));
+
+  root.replaceChildren(h('div', { class: 'player' },
+    playerHeader(session),
+    h('div', { class: 'prep' },
+      h('p', { class: 'eyebrow' },
+        isStretch ? 'Cool-down · stretch' : `Warm-up · ${item.phase}`,
+        ` · ${idx + 1} of ${items.length}`),
+      h('h1', { class: 'prep-title' }, item.name),
+      sideLabel && h('p', { class: 'prep-side' }, sideLabel),
+      h('div', { class: 'prep-demo' }, demoNode),
+      ring,
+      h('p', { class: 'prep-cue' }, item.cue),
+      h('button', { class: 'btn btn-primary btn-block btn-start', onclick: advance },
+        item.seconds ? 'Done' : `Done — ${item.reps}${item.perSide ? ' this side' : ' reps'}`),
+      pips,
+    ),
+  ));
+
+  // Timed drills count themselves down and roll on; rep-based ones wait for you.
+  if (item.seconds) {
+    countdown = new Countdown({
+      seconds: item.seconds,
+      onTick: (left, total) => {
+        label.textContent = mmss(left);
+        ring.style.setProperty('--progress', String(1 - left / total));
+      },
+      onDone: advance,
+    });
+  } else {
+    ring.style.setProperty('--progress', '1');
+  }
+}
+
+// ── working sets ────────────────────────────────────────────────────────────
+function renderWork(root, session, save, rerender) {
+  const { idx: exIdx, set: setIdx } = session.cursor;
+
+  if (exIdx >= session.entries.length) {
+    session.cursor = { phase: 'cooldown', idx: 0, set: 0, side: 0 };
+    save();
+    return renderStep(root, session, save, rerender);
+  }
 
   const entry = session.entries[exIdx];
   const exercise = byId[entry.exerciseId];
   const set = entry.sets[setIdx];
   const unit = getSettings().unit;
   const increment = incrementFor(exercise) || 1;
-  const totalSets = session.entries.reduce((n, e) => n + e.sets.length, 0);
-  const doneSets = session.entries.reduce((n, e) => n + e.sets.filter((s) => s.done).length, 0);
+  const loaded = incrementFor(exercise) > 0;
+  const round = (n) => Math.round(n * 100) / 100;
 
   demoNode = createDemo(exercise.pattern, propFor(exercise));
 
-  const stepper = (label, value, onChange, { step = 1, suffix = '', min = 0 } = {}) =>
+  const stepper = (labelText, value, onChange, { step = 1, min = 0 } = {}) =>
     h('div', { class: 'stepper' },
-      h('span', { class: 'stepper-label' }, label),
+      h('span', { class: 'stepper-label' }, labelText),
       h('div', { class: 'stepper-controls' },
-        h('button', { class: 'step-btn', 'aria-label': `Decrease ${label}`, onclick: () => onChange(Math.max(min, round(value - step))) }, '−'),
-        h('span', { class: 'stepper-value' }, value === null ? '—' : `${round(value)}${suffix}`),
-        h('button', { class: 'step-btn', 'aria-label': `Increase ${label}`, onclick: () => onChange(round(value + step)) }, '+'),
+        h('button', { class: 'step-btn', 'aria-label': `Decrease ${labelText}`, onclick: () => onChange(Math.max(min, round(value - step))) }, '−'),
+        h('span', { class: 'stepper-value' }, value === null ? '—' : `${round(value)}`),
+        h('button', { class: 'step-btn', 'aria-label': `Increase ${labelText}`, onclick: () => onChange(round(value + step)) }, '+'),
       ),
     );
-
-  const round = (n) => Math.round(n * 100) / 100;
-
-  const loaded = incrementFor(exercise) > 0;
 
   const completeSet = () => {
     set.done = true;
     beep(760, 0.12);
 
-    // Carry the numbers you actually used into the remaining sets.
     for (let i = setIdx + 1; i < entry.sets.length; i++) {
       if (!entry.sets[i].done) {
         entry.sets[i].weight = set.weight;
@@ -154,24 +280,17 @@ function renderStep(root, session, save, rerender) {
     const lastExercise = exIdx + 1 >= session.entries.length;
 
     if (lastSetOfExercise && lastExercise) {
-      session.cursor = { ex: session.entries.length, set: 0 };
+      session.cursor = { phase: 'cooldown', idx: 0, set: 0, side: 0 };
       save();
       return renderStep(root, session, save, rerender);
     }
 
-    session.cursor = lastSetOfExercise ? { ex: exIdx + 1, set: 0 } : { ex: exIdx, set: setIdx + 1 };
+    session.cursor = lastSetOfExercise
+      ? { phase: 'work', idx: exIdx + 1, set: 0, side: 0 }
+      : { phase: 'work', idx: exIdx, set: setIdx + 1, side: 0 };
     save();
     renderRest(root, session, entry.rest, save, rerender);
   };
-
-  const header = h('header', { class: 'player-head' },
-    h('a', { class: 'icon-btn', href: '#/', title: 'Leave workout', onclick: teardownWorkout }, '✕'),
-    h('div', { class: 'player-progress' },
-      h('div', { class: 'bar' }, h('div', { class: 'bar-fill', style: { width: `${(doneSets / totalSets) * 100}%` } })),
-      h('span', {}, `${doneSets} / ${totalSets} sets`),
-    ),
-    h('button', { class: 'icon-btn', title: 'Exercise detail', onclick: () => openExercise(exercise) }, 'ⓘ'),
-  );
 
   const body = h('div', { class: 'player-body' },
     h('p', { class: 'eyebrow' }, `${entry.slotLabel} · exercise ${exIdx + 1} of ${session.entries.length}`),
@@ -199,33 +318,37 @@ function renderStep(root, session, save, rerender) {
 
     h('div', { class: 'player-secondary' },
       h('button', { class: 'btn btn-ghost', onclick: async () => {
-        if (await confirmSheet('Skip this exercise?', 'Its remaining sets will be left unlogged.', 'Skip')) {
-          session.cursor = { ex: exIdx + 1, set: 0 };
+        if (await confirmSheet('Skip this exercise?', 'Its remaining sets will be left unlogged. The stretch routine still runs at the end.', 'Skip')) {
+          session.cursor = { phase: 'work', idx: exIdx + 1, set: 0, side: 0 };
           save();
           renderStep(root, session, save, rerender);
         }
       } }, 'Skip exercise'),
       h('button', { class: 'btn btn-ghost', onclick: async () => {
-        if (await confirmSheet('End workout?', 'Sets you have already completed will be saved.', 'End workout')) {
-          finish(session, rerender);
+        if (await confirmSheet('Finish the lifting?', 'Skips straight to the stretch routine. Sets already completed are saved.', 'Go to stretches')) {
+          session.cursor = { phase: 'cooldown', idx: 0, set: 0, side: 0 };
+          save();
+          renderStep(root, session, save, rerender);
         }
-      } }, 'End workout'),
+      } }, 'End lifting'),
     ),
   );
 
-  root.replaceChildren(h('div', { class: 'player' }, header, body));
+  root.replaceChildren(h('div', { class: 'player' },
+    playerHeader(session, () => openExercise(exercise)), body));
 }
 
-// ── timed holds (planks, wall sits, carries) ────────────────────────────────
+// ── timed holds inside the working sets ─────────────────────────────────────
 function runHold(root, session, seconds, onDone) {
   const label = h('div', { class: 'countdown-value' }, mmss(seconds));
   const ring = h('div', { class: 'countdown-ring' }, label);
-  const panel = h('div', { class: 'rest' },
-    h('p', { class: 'eyebrow' }, 'Hold'),
-    ring,
-    h('button', { class: 'btn btn-ghost', onclick: () => { countdown?.stop(); onDone(); } }, 'Finish early'),
-  );
-  root.replaceChildren(h('div', { class: 'player' }, panel));
+  root.replaceChildren(h('div', { class: 'player' },
+    h('div', { class: 'rest' },
+      h('p', { class: 'eyebrow' }, 'Hold'),
+      ring,
+      h('button', { class: 'btn btn-ghost', onclick: () => { countdown?.stop(); onDone(); } }, 'Finish early'),
+    ),
+  ));
 
   countdown = new Countdown({
     seconds,
@@ -239,7 +362,7 @@ function runHold(root, session, seconds, onDone) {
 
 // ── rest between sets ───────────────────────────────────────────────────────
 function renderRest(root, session, seconds, save, rerender) {
-  const { ex: exIdx, set: setIdx } = session.cursor;
+  const { idx: exIdx, set: setIdx } = session.cursor;
   const entry = session.entries[exIdx];
   const exercise = byId[entry.exerciseId];
   const next = entry.sets[setIdx];
@@ -254,25 +377,25 @@ function renderRest(root, session, seconds, save, rerender) {
     renderStep(root, session, save, rerender);
   };
 
-  const panel = h('div', { class: 'rest' },
-    h('p', { class: 'eyebrow' }, 'Rest'),
-    ring,
-    h('div', { class: 'rest-actions' },
-      h('button', { class: 'btn btn-ghost', onclick: () => countdown?.add(30) }, '+30s'),
-      h('button', { class: 'btn btn-primary', onclick: skip }, 'Skip rest'),
-    ),
-    h('div', { class: 'up-next' },
-      h('p', { class: 'eyebrow' }, 'Up next'),
-      h('strong', {}, exercise.name),
-      h('span', { class: 'muted' },
-        `Set ${setIdx + 1} of ${entry.sets.length} · ${next.reps}${exercise.timed ? 's' : ' reps'}`,
-        next.weight ? ` @ ${fmtWeight(next.weight, unit)}` : '',
+  root.replaceChildren(h('div', { class: 'player' },
+    h('div', { class: 'rest' },
+      h('p', { class: 'eyebrow' }, 'Rest'),
+      ring,
+      h('div', { class: 'rest-actions' },
+        h('button', { class: 'btn btn-ghost', onclick: () => countdown?.add(30) }, '+30s'),
+        h('button', { class: 'btn btn-primary', onclick: skip }, 'Skip rest'),
       ),
-      setIdx === 0 && h('button', { class: 'btn btn-ghost btn-sm', onclick: () => openExercise(exercise) }, 'How to do it'),
+      h('div', { class: 'up-next' },
+        h('p', { class: 'eyebrow' }, 'Up next'),
+        h('strong', {}, exercise.name),
+        h('span', { class: 'muted' },
+          `Set ${setIdx + 1} of ${entry.sets.length} · ${next.reps}${exercise.timed ? 's' : ' reps'}`,
+          next.weight ? ` @ ${fmtWeight(next.weight, unit)}` : '',
+        ),
+        setIdx === 0 && h('button', { class: 'btn btn-ghost btn-sm', onclick: () => openExercise(exercise) }, 'How to do it'),
+      ),
     ),
-  );
-
-  root.replaceChildren(h('div', { class: 'player' }, panel));
+  ));
 
   countdown = new Countdown({
     seconds,
@@ -286,14 +409,13 @@ function renderRest(root, session, seconds, save, rerender) {
 
 // ── done ────────────────────────────────────────────────────────────────────
 function finish(session, rerender) {
-  const completed = session.entries.filter((e) => e.sets.some((s) => s.done));
-  if (!completed.length) {
+  const anyWork = session.entries.some((e) => e.sets.some((s) => s.done));
+  if (!anyWork) {
     clearActive();
     toast('Nothing logged — workout discarded.');
     location.hash = '#/';
     return;
   }
-  const prs = detectPRs(session);
   saveSession({
     date: session.date,
     dayIdx: session.dayIdx,
@@ -301,7 +423,11 @@ function finish(session, rerender) {
     dayName: session.dayName,
     durationMin: Math.round((Date.now() - session.startedAt) / 60000),
     entries: session.entries,
-    prs,
+    warmupDone: session.warmup.filter((i) => i.done).length,
+    warmupTotal: session.warmup.length,
+    cooldownDone: session.cooldown.filter((i) => i.done).length,
+    cooldownTotal: session.cooldown.length,
+    prs: detectPRs(session),
   });
   teardownWorkout();
   location.hash = '#/history?justfinished=1';
@@ -329,6 +455,8 @@ function renderSummary(root, session, rerender) {
   const volume = session.entries.reduce((total, e) =>
     total + e.sets.filter((s) => s.done).reduce((v, s) => v + (s.weight ?? 0) * s.reps, 0), 0);
   const minutes = Math.round((Date.now() - session.startedAt) / 60000);
+  const warm = session.warmup.filter((i) => i.done).length;
+  const cool = session.cooldown.filter((i) => i.done).length;
   chime();
 
   root.replaceChildren(h('div', { class: 'player' },
@@ -340,6 +468,10 @@ function renderSummary(root, session, rerender) {
         h('div', { class: 'stat' }, h('strong', {}, doneSets), h('span', {}, 'sets')),
         h('div', { class: 'stat' }, h('strong', {}, `${minutes}`), h('span', {}, 'minutes')),
         h('div', { class: 'stat' }, h('strong', {}, Math.round(volume).toLocaleString()), h('span', {}, `${getSettings().unit} lifted`)),
+      ),
+      h('div', { class: 'summary-blocks' },
+        h('p', { class: `note ${warm === session.warmup.length ? 'note-good' : ''}` },
+          `Warm-up ${warm}/${session.warmup.length} · Stretching ${cool}/${session.cooldown.length}`),
       ),
       h('button', { class: 'btn btn-primary btn-block', onclick: () => finish(session, rerender) }, 'Save and finish'),
     ),

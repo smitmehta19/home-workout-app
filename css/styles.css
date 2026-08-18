@@ -413,3 +413,55 @@ a { color: inherit; text-decoration: none; }
   .view { padding-top: 32px; }
   .ex-demo-frame { width: 132px; }
 }
+
+/* ── warm-up and stretch phases ─────────────────────────────────────────── */
+.prep {
+  flex: 1; display: flex; flex-direction: column; align-items: center;
+  justify-content: center; gap: 14px; text-align: center;
+}
+.prep-title { font-size: 1.5rem; line-height: 1.2; }
+.prep-side {
+  font-size: 0.8rem; font-weight: 650; letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--accent);
+}
+.prep-demo {
+  width: min(46vw, 190px); background: var(--surface);
+  border: 1px solid var(--line); border-radius: var(--radius); padding: 4px;
+}
+.prep-cue { font-size: 0.92rem; color: var(--muted); max-width: 34ch; }
+.prep .countdown-ring { width: min(40vw, 150px); }
+.prep .countdown-value { font-size: 1.9rem; }
+.countdown-ring.is-stretch { background: conic-gradient(var(--rest) calc(var(--progress) * 360deg), var(--surface-2) 0); }
+.prep .btn-start { max-width: 380px; }
+
+.prep-pips { display: flex; gap: 5px; flex-wrap: wrap; justify-content: center; }
+.pip-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--line); }
+.pip-dot.is-done { background: var(--accent); }
+.pip-dot.is-current { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+.icon-btn.is-ghost { background: transparent; border-color: transparent; }
+.summary-blocks { width: 100%; max-width: 380px; }
+
+/* preview + today listings for the two compulsory blocks */
+.prep-list { list-style: none; display: flex; flex-direction: column; }
+.prep-list li {
+  display: grid; grid-template-columns: 74px 1fr auto; gap: 10px; align-items: baseline;
+  padding: 9px 2px; border-top: 1px solid var(--line); font-size: 0.9rem;
+}
+.prep-list li:first-child { border-top: 0; }
+.prep-phase {
+  font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.07em;
+  font-weight: 700; color: var(--accent);
+}
+
+.bookends { display: flex; flex-direction: column; gap: 8px; }
+.bookend {
+  background: var(--surface-2); border: 1px solid var(--line); border-left: 3px solid var(--accent);
+  border-radius: var(--radius-sm); padding: 10px 12px;
+  display: flex; flex-direction: column; gap: 2px;
+}
+.bookend-tag {
+  font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.09em;
+  font-weight: 700; color: var(--accent);
+}
+.bookend .small { line-height: 1.4; }

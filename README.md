@@ -12,11 +12,21 @@ No account. No server. No network required. Everything lives in your browser.
 
 **Today** — A weekly split, generated for you. Each session lists its exercises with a set and rep target and a suggested working weight. Tap any exercise to see how to do it.
 
-**Guided session** — Press Start and it walks you set by set: the movement, an animated demo, your rep target, weight and rep steppers, then an automatic rest countdown with a chime and a preview of what's next. Timed holds like planks get their own countdown. Leave mid-workout and it picks up exactly where you left off.
+**Guided session** — Press Start and it walks you through the whole thing in three phases: the warm-up, then every working set, then the stretch routine. Each working set gives you the movement, an animated demo, your rep target, weight and rep steppers, then an automatic rest countdown with a chime and a preview of what's next. Leave mid-workout and it picks up exactly where you left off.
 
 **Muscle map** — A front and back body diagram where every muscle is tappable. Tap one and you get every exercise in the library that trains it, split into direct work and assistance, along with how many sets a week your current plan gives it.
 
 **History** — Weekly volume trend, estimated one-rep-max personal bests, and a log of every session.
+
+---
+
+## Warm-up and stretching are not optional
+
+Both are phases of the session. You walk through them the same way you walk through your working sets, and the summary reports whether you finished them.
+
+**The warm-up follows RAMP** — Raise, Activate, Mobilise, Potentiate. About six or seven minutes: raise your temperature, switch on the muscles you are about to load, take the joints through the ranges this session needs, then a light ramp-up set of the day's first exercise. The app names that exercise for you, so the last warm-up step is specific to what you are actually about to do.
+
+**The cool-down is static stretching**, 30 seconds a hold, per side where it matters. This is deliberately placed *after* training and never before it: static stretching a cold muscle measurably reduces force output for the session that follows, while the same stretching on warm tissue is where flexibility is actually gained. The routine matches the day — chest, shoulders, triceps, lats and spine after upper days; quads, hamstrings, glutes, hip flexors, calves and adductors after lower days.
 
 ---
 
@@ -39,7 +49,9 @@ This matters more at home than in a gym. With real plates your smallest jump mig
 
 ## The no-bench constraint
 
-Every one of the 67 exercises is performable on the floor with your kit. There are no bench presses, no incline work, no dips, no pull-ups, nothing requiring a rack or a machine. Pressing is done with floor presses, push-up variations, Z-presses and standing overhead work. If a movement isn't in the library, the app can never prescribe it.
+All 101 exercises are performable on the floor with your kit. There are no bench presses, no incline work, no dips, no pull-ups, nothing requiring a rack or a machine. If a movement isn't in the library, the app can never prescribe it.
+
+The library goes well past the obvious. Barbell work includes Zercher squats, push presses, Yates rows, high pulls and behind-the-back deadlifts — all loadable without a rack. Dumbbell work includes squeeze presses, glute-bridge floor presses, thrusters, cleans, swings, Turkish get-ups, windmills, Cossack squats and loaded carries. Wide-stance work (plié squats, lateral lunges, Cossacks) covers the adductors, which almost nothing else at home trains directly, and pike push-ups give you a genuinely hard vertical press once your rod caps out.
 
 ## About the demos
 
@@ -92,7 +104,8 @@ js/
   plan.js             session generation and the progression engine
   ui.js               DOM helpers, bottom sheets, toasts
   data/
-    exercises.js      the 67-exercise library
+    exercises.js      the 101-exercise library
+    mobility.js       RAMP warm-ups and static stretch routines
     plans.js          the 3, 4 and 5 day split templates
     muscles.js        muscle groups
   components/
@@ -105,6 +118,6 @@ js/
 
 ## A note on the training advice
 
-The programming here follows mainstream evidence-based strength and hypertrophy practice: train each muscle at least twice weekly, keep most work in the 5–20 rep range close to but short of failure, rest 2–3 minutes on compounds and 60–90 seconds on isolation work, and add load or reps over time.
+The programming here follows mainstream evidence-based strength and hypertrophy practice: train each muscle at least twice weekly, keep most work in the 5–20 rep range close to but short of failure, rest 2–3 minutes on compounds and 60–90 seconds on isolation work, and add load or reps over time. Warm-ups follow the RAMP model; stretching follows the usual flexibility guidance of 30-second holds performed after training rather than before it.
 
 It is a training tool, not medical advice. If you have an injury or a health condition, talk to someone qualified before following any of it.

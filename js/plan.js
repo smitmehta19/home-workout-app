@@ -11,6 +11,7 @@
 import { SPLITS, DAY_NAMES } from './data/plans.js';
 import { byId } from './data/exercises.js';
 import { getSettings, weekNumber, lastPerformance, weekdayIndex, todayISO } from './state.js';
+import { warmupFor, stretchesFor, blockSeconds } from './data/mobility.js';
 
 /** Round a weight to something you can actually load with your plates. */
 export function roundToIncrement(weight, increment) {
@@ -138,7 +139,19 @@ export function sessionFor(dayIdx = weekdayIndex(), week = weekNumber()) {
     return { slot, exercise, suggestion: suggest(exercise, slot) };
   });
 
-  return { rest: false, split, day, dayIdx, week, weekday: DAY_NAMES[dayIdx], exercises };
+  // Warm-up and cool-down are part of every session, not an optional extra.
+  // The first working exercise is named in the ramp-up set so the potentiation
+  // step tells you exactly what to do a light set of.
+  const warmup = warmupFor(day.name).map((item) =>
+    item.phase === 'Potentiate'
+      ? { ...item, name: `Light set: ${exercises[0].exercise.name}`, pattern: exercises[0].exercise.pattern }
+      : item);
+
+  return {
+    rest: false, split, day, dayIdx, week, weekday: DAY_NAMES[dayIdx], exercises,
+    warmup,
+    cooldown: stretchesFor(day.name),
+  };
 }
 
 /** The next training day at or after `fromIdx`, wrapping into next week. */
@@ -172,7 +185,8 @@ export function estimateMinutes(session) {
     const work = exercise.timed ? slot.reps[1] : slot.reps[1] * 3.5;
     seconds += slot.sets * (work + slot.rest);
   }
-  return Math.round((seconds + 300) / 60); // + warm-up
+  seconds += blockSeconds(session.warmup ?? []) + blockSeconds(session.cooldown ?? []);
+  return Math.round(seconds / 60);
 }
 
 /** Weekly set count per muscle, so the home screen can show the balance. */

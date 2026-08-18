@@ -10,29 +10,12 @@
 // rear delts…) rather than a fixed exercise. Each slot carries a pool of
 // exercises that satisfy that role, and the plan generator rotates through the
 // pool week by week. You get variety without the programme losing its shape.
+//
+// Every session is bracketed by a compulsory RAMP warm-up and a compulsory
+// static-stretch cool-down; both live in data/mobility.js and are assembled
+// into the session by plan.js.
 
 const SLOT = (label, pool, sets, reps, rest, note) => ({ label, pool, sets, reps, rest, note });
-
-const WARMUP_UPPER = [
-  '30 seconds of arm circles, forward then backward',
-  '10 slow band pull-aparts (or arm swings if no band handy)',
-  '10 push-ups at an easy pace',
-  '1 light set of the first exercise at roughly half your working weight',
-];
-
-const WARMUP_LOWER = [
-  '30 seconds of marching on the spot',
-  '10 bodyweight squats to full depth',
-  '10 hip hinges with hands on your hips',
-  '1 light set of the first exercise at roughly half your working weight',
-];
-
-const WARMUP_FULL = [
-  '60 seconds of marching or jogging on the spot',
-  '10 bodyweight squats and 10 arm circles',
-  '10 hip hinges',
-  '1 light set of the first exercise at roughly half your working weight',
-];
 
 export const SPLITS = {
   3: {
@@ -42,23 +25,23 @@ export const SPLITS = {
     schedule: [0, null, 1, null, 2, null, null], // Mon Wed Fri
     days: [
       {
-        name: 'Full Body A', focus: 'Squat · Press · Row', warmup: WARMUP_FULL,
+        name: 'Full Body A', focus: 'Squat · Press · Row',
         slots: [
-          SLOT('Squat pattern',       ['bb-back-squat', 'goblet-squat'],            4, [6, 10],  180),
-          SLOT('Horizontal press',    ['bb-floor-press', 'db-floor-press'],         4, [8, 10],  150),
+          SLOT('Squat pattern',       ['bb-back-squat', 'goblet-squat', 'zercher-squat'],            4, [6, 10],  180),
+          SLOT('Horizontal press',    ['bb-floor-press', 'db-floor-press', 'squeeze-press'],         4, [8, 10],  150),
           SLOT('Horizontal pull',     ['bb-bent-row', 'db-single-row'],             4, [8, 10],  150),
-          SLOT('Hip hinge',           ['bb-rdl', 'db-rdl'],                         3, [10, 12], 120),
-          SLOT('Side delts',          ['lateral-raise'],                            3, [12, 20], 60),
+          SLOT('Hip hinge',           ['bb-rdl', 'db-rdl', 'db-goblet-good-morning'],                         3, [10, 12], 120),
+          SLOT('Side delts',          ['lateral-raise', 'db-scaption'],                            3, [12, 20], 60),
           SLOT('Core',                ['ab-rollout', 'plank'],                      3, [8, 12],  75),
           SLOT('Triceps',             ['overhead-tri-ext', 'band-pushdown'],        3, [10, 15], 75),
         ],
       },
       {
-        name: 'Full Body B', focus: 'Deadlift · Overhead · Pull', warmup: WARMUP_FULL,
+        name: 'Full Body B', focus: 'Deadlift · Overhead · Pull',
         slots: [
           SLOT('Deadlift',            ['bb-deadlift', 'sumo-deadlift'],             4, [5, 6],   180),
-          SLOT('Vertical press',      ['bb-ohp', 'db-shoulder-press'],              4, [8, 10],  150),
-          SLOT('Single-leg',          ['reverse-lunge', 'split-squat'],             3, [10, 12], 90),
+          SLOT('Vertical press',      ['bb-ohp', 'db-shoulder-press', 'bb-push-press', 'db-single-arm-press'],              4, [8, 10],  150),
+          SLOT('Single-leg',          ['reverse-lunge', 'split-squat', 'lateral-lunge', 'db-walking-lunge'],             3, [10, 12], 90),
           SLOT('Vertical pull',       ['band-pulldown', 'db-pullover'],             3, [12, 15], 90),
           SLOT('Biceps',              ['bb-curl', 'hammer-curl'],                   3, [10, 12], 75),
           SLOT('Calves',              ['standing-calf-raise'],                      4, [12, 20], 60),
@@ -66,15 +49,15 @@ export const SPLITS = {
         ],
       },
       {
-        name: 'Full Body C', focus: 'Quads · Volume upper', warmup: WARMUP_FULL,
+        name: 'Full Body C', focus: 'Quads · Volume upper',
         slots: [
-          SLOT('Quad focus',          ['bb-front-squat', 'heels-elevated-squat'],   4, [8, 12],  150),
-          SLOT('Horizontal press',    ['db-floor-press', 'deficit-push-up'],        4, [10, 12], 120),
-          SLOT('Horizontal pull',     ['db-bent-row', 'pendlay-row'],               4, [10, 12], 120),
-          SLOT('Glutes & hamstrings', ['glute-bridge', 'single-leg-rdl'],           3, [12, 15], 90),
+          SLOT('Quad focus',          ['bb-front-squat', 'heels-elevated-squat', 'db-front-squat'],   4, [8, 12],  150),
+          SLOT('Horizontal press',    ['db-floor-press', 'deficit-push-up', 'bridge-press'],        4, [10, 12], 120),
+          SLOT('Horizontal pull',     ['db-bent-row', 'pendlay-row', 'yates-row'],               4, [10, 12], 120),
+          SLOT('Glutes & hamstrings', ['glute-bridge', 'single-leg-rdl', 'plie-squat'], 3, [12, 15], 90),
           SLOT('Triceps',             ['overhead-tri-ext', 'skullcrusher'],         3, [10, 12], 75),
-          SLOT('Rear delts',          ['reverse-flye', 'band-face-pull'],           3, [15, 20], 60),
-          SLOT('Biceps',              ['hammer-curl', 'concentration-curl'],        3, [10, 12], 75),
+          SLOT('Rear delts',          ['reverse-flye', 'band-face-pull', 'band-pull-apart', 'db-wide-row'],           3, [15, 20], 60),
+          SLOT('Biceps',              ['hammer-curl', 'concentration-curl', 'zottman-curl'],        3, [10, 12], 75),
         ],
       },
     ],
@@ -87,51 +70,51 @@ export const SPLITS = {
     schedule: [0, 1, null, 2, 3, null, null], // Mon Tue / Thu Fri
     days: [
       {
-        name: 'Upper A', focus: 'Heavy · Chest, Back, Shoulders, Arms', warmup: WARMUP_UPPER,
+        name: 'Upper A', focus: 'Heavy · Chest, Back, Shoulders, Arms',
         slots: [
-          SLOT('Heavy horizontal press', ['bb-floor-press', 'db-floor-press'],       4, [6, 8],   150),
-          SLOT('Heavy horizontal pull',  ['bb-bent-row', 'pendlay-row'],             4, [6, 8],   150),
-          SLOT('Vertical press',         ['bb-ohp', 'db-shoulder-press'],            3, [8, 10],  120),
+          SLOT('Heavy horizontal press', ['bb-floor-press', 'db-floor-press', 'squeeze-press'],       4, [6, 8],   150),
+          SLOT('Heavy horizontal pull',  ['bb-bent-row', 'pendlay-row', 'yates-row'],             4, [6, 8],   150),
+          SLOT('Vertical press',         ['bb-ohp', 'db-shoulder-press', 'bb-push-press', 'db-single-arm-press'],            3, [8, 10],  120),
           SLOT('Vertical pull',          ['band-pulldown', 'db-pullover'],           3, [12, 15], 90),
-          SLOT('Side delts',             ['lateral-raise'],                          3, [12, 20], 60),
-          SLOT('Biceps',                 ['bb-curl', 'db-curl'],                     3, [8, 12],  75),
+          SLOT('Side delts',             ['lateral-raise', 'db-scaption'],           3, [12, 20], 60),
+          SLOT('Biceps',                 ['bb-curl', 'db-curl', 'zottman-curl'],                     3, [8, 12],  75),
           SLOT('Triceps',                ['overhead-tri-ext', 'close-grip-floor-press'], 3, [10, 12], 75),
         ],
       },
       {
-        name: 'Lower A', focus: 'Heavy · Squat, Hinge, Core', warmup: WARMUP_LOWER,
+        name: 'Lower A', focus: 'Heavy · Squat, Hinge, Core',
         slots: [
-          SLOT('Heavy squat',            ['bb-back-squat', 'bb-front-squat'],        4, [6, 8],   180),
-          SLOT('Hip hinge',              ['bb-rdl', 'db-rdl'],                       4, [8, 10],  150),
-          SLOT('Single-leg',             ['split-squat', 'reverse-lunge'],           3, [10, 12], 90),
-          SLOT('Glutes',                 ['glute-bridge', 'single-leg-glute-bridge'], 3, [12, 15], 90),
-          SLOT('Calves',                 ['standing-calf-raise', 'single-leg-calf-raise'], 4, [12, 20], 60),
+          SLOT('Heavy squat',            ['bb-back-squat', 'bb-front-squat', 'zercher-squat', 'db-front-squat'],        4, [6, 8],   180),
+          SLOT('Hip hinge',              ['bb-rdl', 'db-rdl', 'db-goblet-good-morning'],                       4, [8, 10],  150),
+          SLOT('Single-leg',             ['split-squat', 'reverse-lunge', 'db-walking-lunge', 'bb-reverse-lunge'],           3, [10, 12], 90),
+          SLOT('Glutes',                 ['glute-bridge', 'single-leg-glute-bridge', 'band-glute-kickback'], 3, [12, 15], 90),
+          SLOT('Calves',                 ['standing-calf-raise', 'single-leg-calf-raise', 'bb-calf-raise'], 4, [12, 20], 60),
           SLOT('Core — loaded',          ['ab-rollout', 'leg-raise'],                3, [8, 12],  75),
           SLOT('Core — hold',            ['plank', 'hollow-hold', 'superman'],       3, [30, 60], 60),
         ],
       },
       {
-        name: 'Upper B', focus: 'Volume · Chest, Back, Shoulders, Arms', warmup: WARMUP_UPPER,
+        name: 'Upper B', focus: 'Volume · Chest, Back, Shoulders, Arms',
         slots: [
-          SLOT('Horizontal press',       ['db-floor-press', 'deficit-push-up', 'push-up'], 4, [10, 12], 120),
-          SLOT('Horizontal pull',        ['db-single-row', 'db-bent-row'],           4, [10, 12], 105),
-          SLOT('Vertical press',         ['z-press', 'arnold-press'],                3, [10, 12], 105),
-          SLOT('Rear delts',             ['reverse-flye', 'band-face-pull'],         3, [15, 20], 60),
-          SLOT('Side delts',             ['lateral-raise'],                          3, [12, 20], 60),
-          SLOT('Biceps',                 ['hammer-curl', 'concentration-curl'],      3, [10, 12], 75),
+          SLOT('Horizontal press',       ['db-floor-press', 'deficit-push-up', 'bridge-press', 'squeeze-press'], 4, [10, 12], 120),
+          SLOT('Horizontal pull',        ['db-single-row', 'db-bent-row', 'renegade-row'],           4, [10, 12], 105),
+          SLOT('Vertical press',         ['z-press', 'arnold-press', 'pike-push-up'],                3, [10, 12], 105),
+          SLOT('Rear delts',             ['reverse-flye', 'band-face-pull', 'band-pull-apart', 'db-wide-row'],         3, [15, 20], 60),
+          SLOT('Side delts',             ['lateral-raise', 'db-scaption'],           3, [12, 20], 60),
+          SLOT('Biceps',                 ['hammer-curl', 'concentration-curl', 'zottman-curl'],      3, [10, 12], 75),
           SLOT('Triceps',                ['skullcrusher', 'band-pushdown', 'diamond-push-up'], 3, [10, 15], 75),
         ],
       },
       {
-        name: 'Lower B', focus: 'Volume · Deadlift, Quads, Obliques', warmup: WARMUP_LOWER,
+        name: 'Lower B', focus: 'Volume · Deadlift, Quads, Obliques',
         slots: [
           SLOT('Deadlift',               ['bb-deadlift', 'sumo-deadlift'],           4, [5, 6],   180),
-          SLOT('Quad focus',             ['goblet-squat', 'heels-elevated-squat'],   4, [10, 12], 120),
-          SLOT('Single-leg',             ['reverse-lunge', 'split-squat'],           3, [10, 12], 90),
-          SLOT('Hamstrings',             ['single-leg-rdl', 'band-ham-curl'],        3, [10, 12], 75),
-          SLOT('Calves',                 ['seated-calf-raise', 'standing-calf-raise'], 4, [15, 20], 60),
-          SLOT('Obliques',               ['russian-twist', 'pallof-press'],          3, [16, 24], 60),
-          SLOT('Grip & traps',           ['farmers-carry', 'bb-shrug', 'reverse-curl'], 3, [12, 15], 60),
+          SLOT('Quad focus',             ['goblet-squat', 'heels-elevated-squat', 'plie-squat', 'cossack-squat'],   4, [10, 12], 120),
+          SLOT('Single-leg',             ['reverse-lunge', 'split-squat', 'lateral-lunge', 'db-walking-lunge'],           3, [10, 12], 90),
+          SLOT('Hamstrings',             ['single-leg-rdl', 'band-ham-curl', 'db-goblet-good-morning'],        3, [10, 12], 75),
+          SLOT('Calves',                 ['seated-calf-raise', 'standing-calf-raise', 'bb-calf-raise'], 4, [15, 20], 60),
+          SLOT('Obliques',               ['russian-twist', 'pallof-press', 'db-side-bend', 'suitcase-carry'],          3, [16, 24], 60),
+          SLOT('Grip & traps',           ['farmers-carry', 'bb-shrug', 'bb-high-pull', 'waiter-walk'], 3, [12, 15], 60),
         ],
       },
     ],
@@ -144,59 +127,59 @@ export const SPLITS = {
     schedule: [0, 1, 2, null, 3, 4, null], // Mon Tue Wed / Fri Sat
     days: [
       {
-        name: 'Push', focus: 'Chest, Shoulders, Triceps', warmup: WARMUP_UPPER,
+        name: 'Push', focus: 'Chest, Shoulders, Triceps',
         slots: [
-          SLOT('Heavy press',            ['bb-floor-press', 'db-floor-press'],       4, [6, 8],   150),
-          SLOT('Vertical press',         ['bb-ohp', 'db-shoulder-press'],            4, [8, 10],  135),
+          SLOT('Heavy press',            ['bb-floor-press', 'db-floor-press', 'squeeze-press'],       4, [6, 8],   150),
+          SLOT('Vertical press',         ['bb-ohp', 'db-shoulder-press', 'bb-push-press', 'db-single-arm-press'],            4, [8, 10],  135),
           SLOT('Chest volume',           ['deficit-push-up', 'db-floor-flye'],       3, [10, 15], 90),
-          SLOT('Side delts',             ['lateral-raise'],                          4, [12, 20], 60),
+          SLOT('Side delts',             ['lateral-raise', 'db-scaption'],                          4, [12, 20], 60),
           SLOT('Triceps — overhead',     ['overhead-tri-ext'],                       3, [10, 12], 75),
           SLOT('Triceps — lockout',      ['band-pushdown', 'diamond-push-up'],       3, [12, 20], 60),
         ],
       },
       {
-        name: 'Pull', focus: 'Back, Rear Delts, Biceps', warmup: WARMUP_UPPER,
+        name: 'Pull', focus: 'Back, Rear Delts, Biceps',
         slots: [
-          SLOT('Heavy row',              ['bb-bent-row', 'pendlay-row'],             4, [6, 8],   150),
+          SLOT('Heavy row',              ['bb-bent-row', 'pendlay-row', 'yates-row'],             4, [6, 8],   150),
           SLOT('Vertical pull',          ['band-pulldown', 'db-pullover'],           4, [12, 15], 105),
           SLOT('Single-arm row',         ['db-single-row'],                          3, [10, 12], 90),
-          SLOT('Rear delts',             ['band-face-pull', 'reverse-flye'],         3, [15, 20], 60),
+          SLOT('Rear delts',             ['band-face-pull', 'reverse-flye', 'band-pull-apart', 'db-external-rotation'],         3, [15, 20], 60),
           SLOT('Biceps — barbell',       ['bb-curl', 'drag-curl'],                   3, [8, 12],  75),
           SLOT('Biceps — neutral',       ['hammer-curl'],                            3, [10, 12], 60),
-          SLOT('Traps & grip',           ['bb-shrug', 'farmers-carry', 'reverse-curl'], 3, [12, 15], 60),
+          SLOT('Traps & grip',           ['bb-shrug', 'db-shrug', 'bb-high-pull', 'suitcase-carry'], 3, [12, 15], 60),
         ],
       },
       {
-        name: 'Legs', focus: 'Quads, Hamstrings, Glutes, Calves', warmup: WARMUP_LOWER,
+        name: 'Legs', focus: 'Quads, Hamstrings, Glutes, Calves',
         slots: [
-          SLOT('Heavy squat',            ['bb-back-squat', 'bb-front-squat'],        4, [6, 8],   180),
-          SLOT('Hip hinge',              ['bb-rdl', 'db-rdl'],                       4, [8, 10],  150),
-          SLOT('Single-leg',             ['split-squat', 'reverse-lunge'],           3, [10, 12], 90),
-          SLOT('Glutes',                 ['glute-bridge'],                           3, [12, 15], 90),
+          SLOT('Heavy squat',            ['bb-back-squat', 'bb-front-squat', 'zercher-squat', 'db-front-squat'],        4, [6, 8],   180),
+          SLOT('Hip hinge',              ['bb-rdl', 'db-rdl', 'db-goblet-good-morning'],                       4, [8, 10],  150),
+          SLOT('Single-leg',             ['split-squat', 'reverse-lunge', 'db-walking-lunge', 'bb-reverse-lunge'],           3, [10, 12], 90),
+          SLOT('Glutes',                 ['glute-bridge', 'band-glute-kickback', 'plie-squat'], 3, [12, 15], 90),
           SLOT('Calves',                 ['standing-calf-raise'],                    4, [12, 20], 60),
           SLOT('Core',                   ['ab-rollout', 'leg-raise'],                3, [8, 12],  75),
         ],
       },
       {
-        name: 'Upper', focus: 'Volume · Full upper body', warmup: WARMUP_UPPER,
+        name: 'Upper', focus: 'Volume · Full upper body',
         slots: [
-          SLOT('Horizontal press',       ['db-floor-press', 'push-up'],              4, [10, 12], 120),
-          SLOT('Horizontal pull',        ['db-bent-row', 'db-single-row'],           4, [10, 12], 105),
-          SLOT('Vertical press',         ['z-press', 'arnold-press'],                3, [10, 12], 105),
+          SLOT('Horizontal press',       ['db-floor-press', 'push-up', 'bridge-press'],              4, [10, 12], 120),
+          SLOT('Horizontal pull',        ['db-bent-row', 'db-single-row', 'renegade-row'],           4, [10, 12], 105),
+          SLOT('Vertical press',         ['z-press', 'arnold-press', 'pike-push-up'],                3, [10, 12], 105),
           SLOT('Lat isolation',          ['db-pullover'],                            3, [12, 15], 90),
           SLOT('Rear delts',             ['reverse-flye'],                           3, [15, 20], 60),
           SLOT('Arms superset',          ['concentration-curl', 'skullcrusher'],     3, [10, 12], 75),
         ],
       },
       {
-        name: 'Lower', focus: 'Volume · Deadlift, Quads, Core', warmup: WARMUP_LOWER,
+        name: 'Lower', focus: 'Volume · Deadlift, Quads, Core',
         slots: [
           SLOT('Deadlift',               ['bb-deadlift', 'sumo-deadlift'],           4, [5, 6],   180),
-          SLOT('Quad focus',             ['goblet-squat', 'heels-elevated-squat'],   4, [10, 12], 120),
-          SLOT('Hamstrings',             ['single-leg-rdl', 'band-ham-curl'],        3, [10, 12], 90),
+          SLOT('Quad focus',             ['goblet-squat', 'heels-elevated-squat', 'plie-squat', 'cossack-squat'],   4, [10, 12], 120),
+          SLOT('Hamstrings',             ['single-leg-rdl', 'band-ham-curl', 'db-goblet-good-morning'],        3, [10, 12], 90),
           SLOT('Calves',                 ['seated-calf-raise'],                      4, [15, 20], 60),
-          SLOT('Obliques',               ['russian-twist', 'pallof-press'],          3, [16, 24], 60),
-          SLOT('Core',                   ['dead-bug', 'bird-dog', 'hollow-hold'],    3, [10, 12], 45),
+          SLOT('Obliques',               ['russian-twist', 'pallof-press', 'db-side-bend', 'suitcase-carry'],          3, [16, 24], 60),
+          SLOT('Core',                   ['dead-bug', 'bird-dog', 'turkish-get-up'],    3, [10, 12], 45),
         ],
       },
     ],

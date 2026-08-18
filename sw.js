@@ -4,7 +4,14 @@
 //
 // Bump CACHE when any shell file changes so returning visitors get the update.
 
-const CACHE = 'home-gym-v1';
+const CACHE = 'home-gym-v2';
+const PHOTOS = 'home-gym-photos-v1';
+
+// Demonstration photographs are fetched from the Free Exercise DB and cached on
+// first view, so a movement you have already looked at still shows its photos
+// with no signal. They are never precached — that would be a large download for
+// images you may never open.
+const PHOTO_HOST = 'raw.githubusercontent.com';
 
 const SHELL = [
   './',
@@ -19,8 +26,11 @@ const SHELL = [
   './js/plan.js',
   './js/data/exercises.js',
   './js/data/muscles.js',
+  './js/data/media.js',
+  './js/data/mobility.js',
   './js/data/plans.js',
   './js/components/figure.js',
+  './js/components/guide.js',
   './js/components/bodymap.js',
   './js/components/timer.js',
   './js/components/exercise-sheet.js',
@@ -43,7 +53,7 @@ self.addEventListener('install', (event) => {
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys()
-      .then((keys) => Promise.all(keys.filter((k) => k !== CACHE).map((k) => caches.delete(k))))
+      .then((keys) => Promise.all(keys.filter((k) => k !== CACHE && k !== PHOTOS).map((k) => caches.delete(k))))
       .then(() => self.clients.claim()),
   );
 });
@@ -53,6 +63,20 @@ self.addEventListener('fetch', (event) => {
   if (request.method !== 'GET') return;
 
   const url = new URL(request.url);
+
+  if (url.hostname === PHOTO_HOST) {
+    // Cache-first, and never fall back to index.html for an image — a missing
+    // photo must fail so the app can swap in the drawn figure instead.
+    event.respondWith(
+      caches.open(PHOTOS).then((cache) => cache.match(request).then((hit) => hit ?? fetch(request)
+        .then((response) => {
+          if (response.ok) cache.put(request, response.clone());
+          return response;
+        }))),
+    );
+    return;
+  }
+
   if (url.origin !== self.location.origin) return; // let video links go to the network
 
   event.respondWith(

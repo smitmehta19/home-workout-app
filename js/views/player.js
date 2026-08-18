@@ -8,8 +8,8 @@
 import { h, toast, confirmSheet, fmtWeight } from '../ui.js';
 import { sessionFor, estimateMinutes, incrementFor } from '../plan.js';
 import { byId } from '../data/exercises.js';
-import { createDemo, propFor } from '../components/figure.js';
-import { openExercise } from '../components/exercise-sheet.js';
+import { createGuide } from '../components/guide.js';
+import { openExercise, openDrill } from '../components/exercise-sheet.js';
 import { Countdown, ScreenLock, mmss, chime, beep, primeAudio } from '../components/timer.js';
 import {
   weekdayIndex, weekNumber, todayISO, getActive, setActive, clearActive, saveSession, getSettings, epley, bestE1RM,
@@ -101,7 +101,7 @@ function renderPreview(root, plan, dayIdx) {
     ),
     h('section', { class: 'card' },
       h('h3', {}, `Warm-up · ${plan.warmup.length} drills`),
-      h('ul', { class: 'prep-list' }, plan.warmup.map((i) => h('li', {},
+      h('ul', { class: 'prep-list' }, plan.warmup.map((i) => h('li', { onclick: () => openDrill(i, 'warmup') },
         h('span', { class: 'prep-phase' }, i.phase),
         h('span', {}, i.name),
         h('span', { class: 'muted' }, i.seconds ? `${i.seconds}s` : `${i.reps}${i.perSide ? '/side' : ''}`),
@@ -124,7 +124,7 @@ function renderPreview(root, plan, dayIdx) {
     ),
     h('section', { class: 'card' },
       h('h3', {}, `Stretching · ${plan.cooldown.length} holds`),
-      h('ul', { class: 'prep-list' }, plan.cooldown.map((i) => h('li', {},
+      h('ul', { class: 'prep-list' }, plan.cooldown.map((i) => h('li', { onclick: () => openDrill(i, 'stretch') },
         h('span', { class: 'prep-phase' }, 'Hold'),
         h('span', {}, i.name),
         h('span', { class: 'muted' }, `${i.seconds}s${i.perSide ? '/side' : ''}`),
@@ -195,7 +195,7 @@ function renderPrep(root, session, save, rerender, phase) {
     renderStep(root, session, save, rerender);
   };
 
-  demoNode = createDemo(item.pattern, 'none');
+  demoNode = createGuide(item.id, { pattern: item.pattern, alt: item.name });
 
   const label = h('div', { class: 'countdown-value' }, item.seconds ? mmss(item.seconds) : `${item.reps}`);
   const ring = h('div', { class: `countdown-ring${isStretch ? ' is-stretch' : ''}` }, label);
@@ -204,12 +204,12 @@ function renderPrep(root, session, save, rerender, phase) {
     h('span', { class: `pip-dot${it.done ? ' is-done' : ''}${i === idx ? ' is-current' : ''}` })));
 
   root.replaceChildren(h('div', { class: 'player' },
-    playerHeader(session),
+    playerHeader(session, () => openDrill(item, isStretch ? 'stretch' : 'warmup')),
     h('div', { class: 'prep' },
       h('p', { class: 'eyebrow' },
         isStretch ? 'Cool-down · stretch' : `Warm-up · ${item.phase}`,
         ` · ${idx + 1} of ${items.length}`),
-      h('h1', { class: 'prep-title' }, item.name),
+      h('h1', { class: 'prep-title', onclick: () => openDrill(item, isStretch ? 'stretch' : 'warmup') }, item.name),
       sideLabel && h('p', { class: 'prep-side' }, sideLabel),
       h('div', { class: 'prep-demo' }, demoNode),
       ring,
@@ -253,7 +253,7 @@ function renderWork(root, session, save, rerender) {
   const loaded = incrementFor(exercise) > 0;
   const round = (n) => Math.round(n * 100) / 100;
 
-  demoNode = createDemo(exercise.pattern, propFor(exercise));
+  demoNode = createGuide(exercise.id, { exercise, alt: exercise.name });
 
   const stepper = (labelText, value, onChange, { step = 1, min = 0 } = {}) =>
     h('div', { class: 'stepper' },

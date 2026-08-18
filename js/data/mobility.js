@@ -150,6 +150,73 @@ const FULL_STRETCH = [
   S('childs-pose', "Child's pose", 40, 'Hips to heels, arms long, slow breathing.', { pattern: 'bird-dog' }),
 ];
 
+
+// Full instructions for every drill, so a stretch can be opened and read the
+// same way an exercise can. Merged into the routines below by id.
+const DETAIL = {
+  march: { steps: ['Drive the knees up to about hip height, alternating.', 'Swing the arms naturally.', 'Build from a walk to a brisk jog over the minute.'],
+    avoid: ['Going hard enough to tire yourself before the session starts.'] },
+  'arm-circles': { steps: ['Arms straight out to the sides at shoulder height.', 'Circle forward for twenty seconds, starting small and growing.', 'Reverse and circle backward for twenty.'],
+    avoid: ['Shrugging the shoulders up toward the ears.'] },
+  'pull-apart-warm': { steps: ['Hold a band at shoulder width, arms straight ahead.', 'Pull the hands apart until the band reaches your chest.', 'Return slowly.'],
+    avoid: ['Bending the elbows, which turns it into a row.'] },
+  'scap-pushup': { steps: ['Set up in a push-up position with the arms locked.', 'Without bending the elbows, let the chest sink as the shoulder blades pinch together.', 'Push the floor away so the blades spread apart.'],
+    avoid: ['Bending the elbows — the arms stay straight throughout.'] },
+  'pass-through': { steps: ['Hold the empty rod with a very wide overhand grip in front of your thighs.', 'Keeping the arms straight, raise it overhead and back behind you.', 'Return along the same path.'],
+    avoid: ['Gripping too narrow. Widen the grip until it moves without pinching.'] },
+  'cat-cow': { steps: ['On all fours, hands under shoulders and knees under hips.', 'Round the spine and tuck the chin.', 'Reverse: drop the belly, lift the chest and tailbone.'],
+    avoid: ['Rushing. Move with your breath, one segment at a time.'] },
+  't-rotation': { steps: ['On all fours, place one hand behind your head.', 'Rotate that elbow down toward the opposite wrist.', 'Open it up toward the ceiling, following with your eyes.'],
+    avoid: ['Letting the hips rotate — the movement is in the upper back.'] },
+  'leg-swings': { steps: ['Hold a wall for balance.', 'Swing one leg forward and back, relaxed.', 'Let the range grow with each swing.'],
+    avoid: ['Forcing height early or arching the lower back to swing higher.'] },
+  'glute-bridge-warm': { steps: ['Lie on your back, knees bent, feet flat.', 'Drive through the heels to lift the hips.', 'Squeeze the glutes hard at the top, then lower.'],
+    avoid: ['Arching the lower back instead of finishing with the glutes.'] },
+  'bird-dog-warm': { steps: ['On all fours, extend one arm forward and the opposite leg back.', 'Hold two seconds in a straight line.', 'Return and switch sides.'],
+    avoid: ['Letting the hips tilt as the leg lifts.'] },
+  'bw-squat': { steps: ['Feet shoulder width, toes slightly out.', 'Squat as deep as you comfortably can.', 'Pause a beat at the bottom of the last few reps.'],
+    avoid: ['Letting the heels lift or the knees cave inward.'] },
+  'hip-9090': { steps: ['Sit with both knees bent at 90°, one leg in front, one out to the side.', 'Drop both knees to the other side without using your hands.', 'Alternate slowly.'],
+    avoid: ['Using your hands to force the rotation.'] },
+  'ankle-rock': { steps: ['Half-kneeling with the front foot flat.', 'Drive the front knee forward over the toes.', 'Keep the heel glued down, then return.'],
+    avoid: ['Letting the heel lift, which removes the ankle stretch.'] },
+  'worlds-greatest': { steps: ['Step into a deep lunge.', 'Drop the inside elbow toward the floor beside the front foot.', 'Rotate that arm up to the ceiling, then switch sides.'],
+    avoid: ['Letting the back knee sag to the floor.'] },
+  'ramp-set-upper': { steps: ['Load roughly half your working weight.', 'Perform 8 controlled reps.', 'Rest a minute, then start your first working set.'],
+    avoid: ['Going anywhere near failure. This is preparation, not training.'] },
+  'ramp-set-lower': { steps: ['Load roughly half your working weight.', 'Perform 8 controlled reps.', 'Rest a minute, then start your first working set.'],
+    avoid: ['Turning it into a real set.'] },
+  'ramp-set-full': { steps: ['Load roughly half your working weight.', 'Perform 8 controlled reps.', 'Rest a minute, then start your first working set.'],
+    avoid: ['Turning it into a real set.'] },
+
+  'chest-wall': { steps: ['Place the forearm flat against a door frame, elbow at shoulder height.', 'Step through slightly and turn your chest away.', 'Hold where you feel a stretch across the front of the shoulder and chest.'],
+    avoid: ['Pushing into sharp pain at the front of the shoulder — ease off until it is a stretch only.'] },
+  'cross-body': { steps: ['Bring one arm straight across your chest.', 'Hook it with the opposite forearm and draw it closer.', 'Keep the shoulder pressed down.'],
+    avoid: ['Pulling on the elbow joint itself, or letting the shoulder shrug up.'] },
+  'tri-overhead': { steps: ['Raise one arm overhead and bend the elbow so the hand drops behind your head.', 'Use the other hand to press gently back on the elbow.', 'Keep the ribs down.'],
+    avoid: ['Arching the lower back to gain more range.'] },
+  'childs-pose': { steps: ['Kneel and sit your hips back onto your heels.', 'Walk both hands forward and let the chest sink.', 'Walk the hands left, then right, to reach each lat.'],
+    avoid: ['Holding your breath — this one is about slow breathing.'] },
+  'spinal-twist': { steps: ['Sit tall with one leg crossed over the other.', 'Rotate your torso toward the top knee.', 'Use the arm as a light anchor, not a lever.'],
+    avoid: ['Cranking with the arm, or slumping the lower back.'] },
+  'neck-side': { steps: ['Let one ear fall toward that shoulder.', 'Let the opposite arm hang heavy to increase the stretch.', 'Breathe and hold — no bouncing.'],
+    avoid: ['Pulling the head with your hand. Gravity is enough here.'] },
+  'quad-stand': { steps: ['Stand on one leg, holding a wall.', 'Pull the other heel toward your glute.', 'Keep the knees together and push the hip forward.'],
+    avoid: ['Letting the knee drift out to the side, or arching the lower back.'] },
+  'hamstring-seated': { steps: ['Sit with one leg straight, the other tucked in.', 'Hinge forward from the hip with a flat back.', 'Reach the chest toward the knee.'],
+    avoid: ['Rounding the spine to get the hands further — the stretch comes from the hip.'] },
+  'figure-4': { steps: ['Lie on your back and cross one ankle over the opposite knee.', 'Thread your hands behind the far thigh.', 'Draw that thigh toward your chest.'],
+    avoid: ['Lifting the head and shoulders off the floor to reach.'] },
+  'hip-flexor': { steps: ['Half-kneeling, back knee on the mat.', 'Tuck the pelvis under first — this is the important part.', 'Then press the hips forward until you feel the front of the back hip stretch.'],
+    avoid: ['Skipping the pelvic tuck and just leaning forward, which stretches nothing.'] },
+  'calf-wall': { steps: ['Hands on a wall, one leg back and straight, heel down.', 'Lean in until the calf stretches.', 'Repeat with that knee slightly bent to reach the deeper soleus.'],
+    avoid: ['Letting the back heel lift off the floor.'] },
+  'butterfly': { steps: ['Sit with the soles of your feet together.', 'Let the knees fall open toward the floor.', 'Sit tall, and hinge gently forward from the hips for more.'],
+    avoid: ['Bouncing the knees, or rounding the back instead of hinging.'] },
+};
+
+const withDetail = (items) => items.map((i) => ({ ...i, ...(DETAIL[i.id] ?? {}) }));
+
 /** Pick the routine matching a session's emphasis. */
 function routineKey(dayName = '') {
   const n = dayName.toLowerCase();
@@ -161,8 +228,8 @@ function routineKey(dayName = '') {
 const WARMUPS = { upper: UPPER_WARMUP, lower: LOWER_WARMUP, full: FULL_WARMUP };
 const STRETCHES = { upper: UPPER_STRETCH, lower: LOWER_STRETCH, full: FULL_STRETCH };
 
-export const warmupFor = (dayName) => WARMUPS[routineKey(dayName)];
-export const stretchesFor = (dayName) => STRETCHES[routineKey(dayName)];
+export const warmupFor = (dayName) => withDetail(WARMUPS[routineKey(dayName)]);
+export const stretchesFor = (dayName) => withDetail(STRETCHES[routineKey(dayName)]);
 
 /** Rough duration of a warm-up or stretch block, in seconds. */
 export const blockSeconds = (items) =>

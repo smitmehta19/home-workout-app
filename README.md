@@ -33,6 +33,10 @@ No account. No server. No network required. Everything lives in your browser.
 
 This matters more at home than in a gym. With real plates your smallest jump might be 2.5 kg, which on a 10 kg curl is a 25% increase nobody absorbs weekly. Climbing reps first bridges the gap between the weights you can physically make.
 
+**Every movement can be opened.** Tap any exercise, warm-up drill or stretch — from the home screen, the muscle map, the session preview or mid-workout — and you get how to set up, numbered steps, the cues that matter, what to avoid, and a demonstration.
+
+Demonstrations use real start/end photographs from the [Free Exercise DB](https://github.com/yuhonas/free-exercise-db), crossfaded so you can see both positions of the lift; 85 of the 101 exercises and 21 of the 29 warm-up and stretch drills are mapped. The images are linked rather than copied into this repo, and cached by the service worker the first time you view them so they still show with no signal. A drawn figure renders underneath and stays visible until both photos arrive, so a slow connection, a failed request or an unmapped movement all end up showing the drawing rather than a blank frame.
+
 **Warm-up and stretching are compulsory.** Both are phases of the session rather than optional extras, and the summary reports whether you finished them.
 
 The warm-up follows RAMP — Raise, Activate, Mobilise, Potentiate. Six or seven minutes: raise your temperature, switch on the muscles you are about to load, move the joints through the ranges this session needs, then a light ramp-up set of the day's first exercise, which the app names for you.
@@ -59,10 +63,12 @@ js/
   data/
     exercises.js      the 101-exercise library
     mobility.js       RAMP warm-ups and static stretch routines
+    media.js          movement -> Free Exercise DB photo mapping
     plans.js          the 3, 4 and 5 day split templates
     muscles.js        muscle groups
   components/
     figure.js         animated demo figure and movement patterns
+    guide.js          photo demonstration with drawn fallback
     bodymap.js        interactive front/back muscle chart
     timer.js          rest countdown, audio cues, wake lock
     exercise-sheet.js exercise detail view
@@ -74,3 +80,7 @@ js/
 The programming here follows mainstream evidence-based strength and hypertrophy practice: train each muscle at least twice weekly, keep most work in the 5–20 rep range close to but short of failure, rest 2–3 minutes on compounds and 60–90 seconds on isolation work, and add load or reps over time. Warm-ups follow the RAMP model; stretching follows the usual flexibility guidance of 30-second holds done after training rather than before it.
 
 It is a training tool, not medical advice. If you have an injury or a health condition, talk to someone qualified before following any of it.
+
+## Credits
+
+Demonstration photographs come from the [Free Exercise DB](https://github.com/yuhonas/free-exercise-db), which publishes itself as public domain. They are linked from that project rather than redistributed here. Note that the project carries no LICENSE file at its root and the provenance of the photographs has been raised in its issue tracker, so if you fork this, satisfy yourself about the licensing or simply delete `js/data/media.js` — every movement then falls back to the drawn demonstration.

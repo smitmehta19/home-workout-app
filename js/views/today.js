@@ -3,7 +3,7 @@
 import { h } from '../ui.js';
 import { sessionFor, nextTrainingDay, weekOverview, estimateMinutes } from '../plan.js';
 import { weekdayIndex, weekNumber, getSessions, getActive, todayISO } from '../state.js';
-import { openExercise } from '../components/exercise-sheet.js';
+import { openExercise, openDrill } from '../components/exercise-sheet.js';
 import { muscleName } from '../data/muscles.js';
 import { getSettings } from '../state.js';
 
@@ -128,13 +128,15 @@ export function renderToday(root) {
         h('div', { class: 'bookend' },
           h('span', { class: 'bookend-tag' }, 'Always first'),
           h('strong', {}, `Warm-up · ${session.warmup.length} drills`),
-          h('span', { class: 'muted small' },
-            session.warmup.map((w) => w.name.replace(/^Light set: .*/, 'ramp-up set')).join(' · ')),
+          h('div', { class: 'drill-chips' }, session.warmup.map((w) =>
+            h('button', { class: 'drill-chip', onclick: () => openDrill(w, 'warmup') },
+              w.name.replace(/^Light set: .*/, 'Ramp-up set')))),
         ),
         h('div', { class: 'bookend' },
           h('span', { class: 'bookend-tag' }, 'Always last'),
           h('strong', {}, `Stretching · ${session.cooldown.length} holds`),
-          h('span', { class: 'muted small' }, session.cooldown.map((c) => c.name).join(' · ')),
+          h('div', { class: 'drill-chips' }, session.cooldown.map((c) =>
+            h('button', { class: 'drill-chip', onclick: () => openDrill(c, 'stretch') }, c.name))),
         ),
       ),
     );

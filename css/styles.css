@@ -465,3 +465,47 @@ a { color: inherit; text-decoration: none; }
   font-weight: 700; color: var(--accent);
 }
 .bookend .small { line-height: 1.4; }
+
+/* ── photo guidance ─────────────────────────────────────────────────────── */
+/* The drawn figure sits underneath and shows until both photos have loaded, so
+   the frame is never blank on a slow connection or offline. */
+.guide { position: relative; width: 100%; aspect-ratio: 4 / 3; border-radius: var(--radius-sm); overflow: hidden; background: #fff; }
+.guide.is-drawn { background: transparent; }
+.guide-drawn { position: absolute; inset: 0; display: grid; place-items: center; }
+.guide-drawn .demo { max-height: 100%; width: auto; }
+.guide:not(.is-drawn) .guide-drawn { display: none; }
+.guide-img {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  object-fit: cover; opacity: 0; transition: opacity 0.45s ease;
+}
+.guide:not(.is-drawn) .guide-img.is-on { opacity: 1; }
+.guide-badge {
+  position: absolute; left: 8px; bottom: 8px; z-index: 2;
+  font-size: 0.62rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em;
+  background: rgba(11, 13, 16, 0.82); color: var(--accent);
+  padding: 3px 8px; border-radius: 99px;
+}
+
+.guide-hero { width: 100%; margin-bottom: 2px; }
+.guide-hero .guide { aspect-ratio: 3 / 2; }
+
+.credit { font-size: 0.72rem; color: var(--muted); text-align: center; padding-top: 4px; }
+.credit a { text-decoration: underline; }
+
+/* the player's inline guide */
+.player-demo .guide, .prep-demo .guide { border-radius: var(--radius-sm); }
+.player-demo { padding: 0; overflow: hidden; }
+.player-demo .demo { padding: 6px; }
+.prep-demo { padding: 0; overflow: hidden; }
+.prep-demo .demo { padding: 4px; }
+.prep-title { cursor: pointer; }
+
+.prep-list li { cursor: pointer; }
+.prep-list li:active { background: var(--surface-2); }
+.drill-chips { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 5px; }
+.drill-chip {
+  appearance: none; font: inherit; cursor: pointer;
+  font-size: 0.74rem; padding: 5px 10px; border-radius: 99px;
+  background: var(--surface); color: var(--muted); border: 1px solid var(--line);
+}
+.drill-chip:active { background: var(--accent); color: var(--accent-ink); }
